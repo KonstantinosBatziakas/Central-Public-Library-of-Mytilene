@@ -33,16 +33,16 @@ nav.scrolled{background:rgba(14,12,10,0.96);-webkit-backdrop-filter:blur(12px);b
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(184,149,42,0.09) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(184,149,42,0.05) 0%,transparent 50%),linear-gradient(135deg,#0e0c0a 0%,#1a1714 50%,#0e0c0a 100%)}
 .hero-grain{position:absolute;inset:0;opacity:0.025;background-image:url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’/%3E%3C/svg%3E”);background-size:200px}
 .hero-content{text-align:center;z-index:2;padding:0 20px}
-.hero-eyebrow{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(–gold);margin-bottom:28px;opacity:0;animation:fadeUp 1s 0.3s ease forwards;font-weight:500}
-.hero-title{font-family:‘Cormorant Garamond’,serif;font-size:clamp(2.8rem,7.5vw,6.5rem);font-weight:300;color:var(–parchment);line-height:1.05;letter-spacing:-0.01em;opacity:0;animation:fadeUp 1s 0.5s ease forwards;margin-bottom:8px}
-.hero-title em{font-style:italic;color:var(–gold-light)}
-.hero-subtitle{font-family:‘Cormorant Garamond’,serif;font-size:clamp(1rem,2.5vw,1.5rem);font-weight:300;font-style:italic;color:rgba(245,240,232,0.5);margin-bottom:48px;opacity:0;animation:fadeUp 1s 0.7s ease forwards}
-.hero-divider{width:60px;height:1px;background:var(–gold);margin:0 auto 48px;opacity:0;animation:fadeUp 1s 0.9s ease forwards}
-.hero-cta{display:inline-flex;align-items:center;gap:14px;font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(–parchment);text-decoration:none;border:1px solid rgba(184,149,42,0.4);padding:16px 36px;transition:all 0.4s;opacity:0;animation:fadeUp 1s 1.1s ease forwards;font-weight:500}
-.hero-cta:hover{background:rgba(184,149,42,0.1);border-color:var(–gold);color:var(–gold-light)}
+.hero-eyebrow{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:#b8952a;margin-bottom:28px;animation:fadeUp 1s 0.3s ease forwards;font-weight:500}
+.hero-title{font-family:‘Cormorant Garamond’,serif;font-size:clamp(2.8rem,7.5vw,6.5rem);font-weight:300;color:#f5f0e8;line-height:1.05;letter-spacing:-0.01em;animation:fadeUp 1s 0.5s ease forwards;margin-bottom:8px}
+.hero-title em{font-style:italic;color:#d4af5a}
+.hero-subtitle{font-family:‘Cormorant Garamond’,serif;font-size:clamp(1rem,2.5vw,1.5rem);font-weight:300;font-style:italic;color:rgba(245,240,232,0.5);margin-bottom:48px;animation:fadeUp 1s 0.7s ease forwards}
+.hero-divider{width:60px;height:1px;background:#b8952a;margin:0 auto 48px;animation:fadeUp 1s 0.9s ease forwards}
+.hero-cta{display:inline-flex;align-items:center;gap:14px;font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:#f5f0e8 !important;text-decoration:none !important;border:1px solid rgba(184,149,42,0.4);padding:16px 36px;transition:all 0.4s;animation:fadeUp 1s 1.1s ease forwards;font-weight:500}
+.hero-cta:hover{background:rgba(184,149,42,0.1);border-color:#b8952a;color:#d4af5a !important}
 .hero-cta::after{content:‘↓’;font-size:1rem}
 .hero-founded{position:absolute;bottom:40px;left:60px;font-size:0.58rem;letter-spacing:0.2em;color:rgba(245,240,232,0.2);text-transform:uppercase}
-.scroll-line{position:absolute;bottom:0;left:50%;width:1px;height:80px;background:linear-gradient(to bottom,transparent,var(–gold));animation:scrollAnim 2s 2s ease infinite}
+.scroll-line{position:absolute;bottom:0;left:50%;width:1px;height:80px;background:linear-gradient(to bottom,transparent,#b8952a);animation:scrollAnim 2s 2s ease infinite}
 @keyframes scrollAnim{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
@@ -145,11 +145,11 @@ footer{background:#0a0908;padding:44px 60px;display:flex;justify-content:space-b
 /* MOBILE NAV */
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;pointer-events:all;background:none;border:none}
 .hamburger span{display:block;width:24px;height:2px;background:var(–parchment);transition:all 0.3s}
-.mobile-menu{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(14,12,10,0.98);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px}
-.mobile-menu.open{display:flex}
-.mobile-menu a{font-size:1.1rem;letter-spacing:0.2em;text-transform:uppercase;color:var(–parchment);text-decoration:none;font-family:‘Cormorant Garamond’,serif;font-weight:300}
-.mobile-menu a:hover{color:var(–gold)}
-.mobile-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(–parchment);font-size:1.8rem;cursor:pointer;line-height:1}
+.mobile-menu{visibility:hidden;opacity:0;pointer-events:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(14,12,10,0.98);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity 0.3s,visibility 0.3s}
+.mobile-menu.open{visibility:visible;opacity:1;pointer-events:all}
+.mobile-menu a{font-size:1.1rem;letter-spacing:0.2em;text-transform:uppercase;color:#f5f0e8 !important;text-decoration:none !important;font-family:‘Cormorant Garamond’,serif;font-weight:300}
+.mobile-menu a:hover{color:#d4af5a !important}
+.mobile-close{position:absolute;top:24px;right:24px;background:none;border:none;color:#f5f0e8 !important;font-size:1.8rem;cursor:pointer;line-height:1;-webkit-appearance:none;appearance:none}
 @media(max-width:768px){
 .hamburger{display:flex}
 .nav-links{display:none!important}
@@ -172,7 +172,7 @@ footer{flex-direction:column;gap:14px;text-align:center}
 
 <!-- MOBILE MENU -->
 
-<div class="mobile-menu" id="mobileMenu" style="display:none">
+<div class="mobile-menu" id="mobileMenu">
   <button class="mobile-close" id="mobileClose">✕</button>
   <a href="#about" onclick="closeMobileMenu()">About</a>
   <a href="#collections" onclick="closeMobileMenu()">Collections</a>
@@ -520,14 +520,13 @@ document.getElementById('langToggle').addEventListener('click', () => {
 });
 
 document.getElementById('hamburger').addEventListener('click',()=>{
-  const m = document.getElementById('mobileMenu');
-  m.style.display = 'flex';
+  document.getElementById('mobileMenu').classList.add('open');
 });
 document.getElementById('mobileClose').addEventListener('click',()=>{
-  document.getElementById('mobileMenu').style.display = 'none';
+  document.getElementById('mobileMenu').classList.remove('open');
 });
 function closeMobileMenu(){
-  document.getElementById('mobileMenu').style.display = 'none';
+  document.getElementById('mobileMenu').classList.remove('open');
 }
 </script>
 
