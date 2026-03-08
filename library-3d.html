@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης — 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#b8952a;--dark:#0d0b09;--parchment:#f5f0e8;--muted:#8b7f6e}
+body{background:var(--dark);font-family:'Montserrat',sans-serif;overflow:hidden;height:100vh;color:var(--parchment)}
+canvas{display:block}
+#wrap{width:100vw;height:100vh;position:relative}
+.ui{position:absolute;inset:0;pointer-events:none}
+.title-box{position:absolute;top:26px;left:34px}
+.lbl{font-size:0.5rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;font-weight:500}
+.ttl{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:300;line-height:1.1;color:var(--parchment)}
+.ttl em{font-style:italic;color:var(--gold)}
+.sub{font-size:0.56rem;color:var(--muted);letter-spacing:0.07em;margin-top:3px}
+.views{position:absolute;top:26px;right:34px;display:flex;flex-direction:column;gap:6px;pointer-events:all}
+.vb{background:rgba(13,11,9,0.9);border:1px solid rgba(184,149,42,0.25);color:rgba(245,240,232,0.8);padding:9px 15px;font-family:'Montserrat',sans-serif;font-size:0.58rem;letter-spacing:0.13em;text-transform:uppercase;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(10px);font-weight:500}
+.vb:hover,.vb.on{background:rgba(184,149,42,0.12);border-color:var(--gold);color:var(--gold)}
+.info{position:absolute;bottom:26px;left:34px;background:rgba(13,11,9,0.92);border:1px solid rgba(184,149,42,0.18);padding:17px 22px;max-width:310px;backdrop-filter:blur(10px)}
+.ititle{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);margin-bottom:6px;font-weight:400}
+.idesc{font-size:0.68rem;color:rgba(245,240,232,0.55);line-height:1.75;font-weight:300}
+.hint{position:absolute;bottom:26px;right:34px;text-align:right}
+.hint p{font-size:0.54rem;color:rgba(245,240,232,0.25);letter-spacing:0.07em;line-height:2}
+.hint span{color:rgba(184,149,42,0.55)}
+.loading{position:absolute;inset:0;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:100}
+.loading p{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold)}
+.bar{width:200px;height:1px;background:rgba(184,149,42,0.15);position:relative;overflow:hidden}
+.bar::after{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:var(--gold);animation:load 1.5s ease infinite}
+@keyframes load{to{left:100%}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="loading" id="loading">
+    <p>Building 3D Model</p>
+    <div class="bar"></div>
+  </div>
+  <div class="ui">
+    <div class="title-box">
+      <div class="lbl">3D Interactive Model</div>
+      <div class="ttl">Public Central <em>Library</em></div>
+      <div class="sub">Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης</div>
+    </div>
+    <div class="views">
+      <button class="vb on" onclick="goView('street')">🏛 Street View</button>
+      <button class="vb" onclick="goView('front')">🔍 Front Facade</button>
+      <button class="vb" onclick="goView('inside1')">📚 Ground Floor</button>
+      <button class="vb" onclick="goView('inside2')">📖 First Floor</button>
+      <button class="vb" onclick="goView('aerial')">🗺 Aerial View</button>
+      <button class="vb" onclick="goView('garden')">🌿 Garden Side</button>
+    </div>
+    <div class="info">
+      <div class="ititle" id="ititle">Street View</div>
+      <div class="idesc" id="idesc">The Public Central Library of Mytilene on Smyrnis Street. A two-storey neoclassical building with white plastered walls, terracotta hip roof, and distinctive burgundy red windows with arched frames. Founded 1913.</div>
+    </div>
+    <div class="hint">
+      <p><span>Drag</span> — rotate</p>
+      <p><span>Scroll</span> — zoom</p>
+      <p><span>Right drag</span> — pan</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+const W=window.innerWidth, H=window.innerHeight;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87CEEB);
+scene.fog=new THREE.FogExp2(0xb0d4e8,0.012);
+
+const cam=new THREE.PerspectiveCamera(48,W/H,0.1,400);
+cam.position.set(0,10,32);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(W,H);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+document.getElementById('wrap').appendChild(renderer.domElement);
+
+// Lights
+const amb=new THREE.AmbientLight(0xfff5e0,0.5);scene.add(amb);
+const sun=new THREE.DirectionalLight(0xfff0d0,2.0);
+sun.position.set(18,30,20);sun.castShadow=true;
+sun.shadow.mapSize.set(4096,4096);
+sun.shadow.camera.left=-35;sun.shadow.camera.right=35;
+sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
+sun.shadow.camera.far=100;
+scene.add(sun);
+const fill=new THREE.DirectionalLight(0xc8e0ff,0.5);fill.position.set(-12,8,-10);scene.add(fill);
+
+// ── MATERIALS ──────────────────────────────────────────────────────────────
+const M={
+  wall:      new THREE.MeshLambertMaterial({color:0xf0ece0}),
+  wall2:     new THREE.MeshLambertMaterial({color:0xe8e4d8}),
+  cornice:   new THREE.MeshLambertMaterial({color:0xf8f4ec}),
+  roof:      new THREE.MeshLambertMaterial({color:0x8B3A2A}),
+  roofRidge: new THREE.MeshLambertMaterial({color:0x6B2A1A}),
+  winFrame:  new THREE.MeshLambertMaterial({color:0x7a1c1c}),
+  shutter:   new THREE.MeshLambertMaterial({color:0x8B1A1A}),
+  glass:     new THREE.MeshLambertMaterial({color:0x6a9fbb,transparent:true,opacity:0.55}),
+  glassBlue: new THREE.MeshLambertMaterial({color:0x4466aa,transparent:true,opacity:0.7}),
+  door:      new THREE.MeshLambertMaterial({color:0x8B0000}),
+  doorWood:  new THREE.MeshLambertMaterial({color:0x6b3a1a}),
+  transom:   new THREE.MeshLambertMaterial({color:0x3355aa,transparent:true,opacity:0.8}),
+  iron:      new THREE.MeshLambertMaterial({color:0x1a1a1a}),
+  pebble:    new THREE.MeshLambertMaterial({color:0xc8bca8}),
+  pavement:  new THREE.MeshLambertMaterial({color:0xb8a898}),
+  road:      new THREE.MeshLambertMaterial({color:0x555050}),
+  soil:      new THREE.MeshLambertMaterial({color:0x7a6a50}),
+  grass:     new THREE.MeshLambertMaterial({color:0x4a8030}),
+  treeTrunk: new THREE.MeshLambertMaterial({color:0x3d2510}),
+  treeLeaf:  new THREE.MeshLambertMaterial({color:0x2d6020}),
+  orangeLeaf:new THREE.MeshLambertMaterial({color:0x3a7025}),
+  orange:    new THREE.MeshLambertMaterial({color:0xf07800}),
+  stone:     new THREE.MeshLambertMaterial({color:0xd4c8b0}),
+  iFloor:    new THREE.MeshLambertMaterial({color:0xc8a878}),
+  iWall:     new THREE.MeshLambertMaterial({color:0xf0ead8}),
+  iCeil:     new THREE.MeshLambertMaterial({color:0xf8f4ee}),
+  shelf:     new THREE.MeshLambertMaterial({color:0x5c3818}),
+  shelfDark: new THREE.MeshLambertMaterial({color:0x4a2c10}),
+  bookR:     new THREE.MeshLambertMaterial({color:0x8B2020}),
+  bookB:     new THREE.MeshLambertMaterial({color:0x1a3a7a}),
+  bookG:     new THREE.MeshLambertMaterial({color:0x1a5a2a}),
+  bookY:     new THREE.MeshLambertMaterial({color:0x8a6010}),
+  bookBr:    new THREE.MeshLambertMaterial({color:0x5a3010}),
+  bookPu:    new THREE.MeshLambertMaterial({color:0x5a1a5a}),
+  bookPg:    new THREE.MeshLambertMaterial({color:0xf0e0c0}),
+  table:     new THREE.MeshLambertMaterial({color:0x6b3818}),
+  boxwood:   new THREE.MeshLambertMaterial({color:0x2a5a18}),
+  fence:     new THREE.MeshLambertMaterial({color:0x222222}),
+  fencePost: new THREE.MeshLambertMaterial({color:0xd0c8b0}),
+  stair:     new THREE.MeshLambertMaterial({color:0xe0d8c8}),
+  flag:      new THREE.MeshLambertMaterial({color:0x0050a0}),
+  flagW:     new THREE.MeshLambertMaterial({color:0xffffff}),
+  lantern:   new THREE.MeshLambertMaterial({color:0x111111}),
+  glow:      new THREE.MeshLambertMaterial({color:0xffee99,emissive:new THREE.Color(0xffcc44),emissiveIntensity:0.6}),
+  sky:       new THREE.MeshLambertMaterial({color:0x87CEEB,side:THREE.BackSide}),
+};
+
+// helpers
+function B(w,h,d,mat,x,y,z,ry){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  m.position.set(x,y,z);if(ry)m.rotation.y=ry;
+  m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
+}
+function C(rt,rb,h,seg,mat,x,y,z){
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),mat);
+  m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
+}
+function S(r,seg,mat,x,y,z){
+  const m=new THREE.Mesh(new THREE.SphereGeometry(r,seg,seg),mat);
+  m.position.set(x,y,z);m.castShadow=true;scene.add(m);return m;
+}
+
+// ─── GROUND ────────────────────────────────────────────────────────────────
+B(100,0.2,100,M.pavement,0,-0.1,0);
+B(100,0.05,10,M.road,0,0.01,-20); // road in front
+B(100,0.05,10,M.road,0,0.01,20);  // road behind
+// pebble courtyard inside fence
+B(20,0.08,14,M.pebble,0,0.04,0);
+// garden left side
+B(10,0.08,14,M.soil,-15,0.04,0);
+
+// ─── MAIN BUILDING ─────────────────────────────────────────────────────────
+// The building is wider than tall, single-span, two floors
+// Ground floor body
+B(22,4.2,14,M.wall, 0,2.1,0);
+// Second floor body  
+B(22,4.0,14,M.wall2, 0,6.3,0);
+// Thick cornice / eaves band
+B(23,0.5,15,M.cornice, 0,8.55,0);
+B(23,0.35,15.2,M.cornice, 0,8.25,0);
+// String course between floors
+B(22.3,0.28,14.3,M.cornice, 0,4.24,0);
+B(22.3,0.18,14.3,M.cornice, 0,4.0,0);
+// Base plinth
+B(22.3,0.4,14.3,M.cornice, 0,0.2,0);
+
+// ─── ROOF ─────────────────────────────────────────────────────────────────
+// Hip roof — 4 triangular faces using custom geometry
+function hipRoof(){
+  const hw=11.5,hd=7.5,rh=3.2,ry=8.7;
+  // Front slope
+  const fg=new THREE.BufferGeometry();
+  const fv=new Float32Array([
+    -hw,0,hd,  hw,0,hd,  0,rh,0,   // front triangle top
+    -hw,0,-hd, hw,0,-hd, 0,rh,0,   // back triangle
+    -hw,0,hd, -hw,0,-hd, 0,rh,0,   // left triangle
+    hw,0,hd,  hw,0,-hd,  0,rh,0,   // right triangle
+  ]);
+  // Use 4 separate meshes for the 4 roof faces
+  function roofFace(v1,v2,apex){
+    const g=new THREE.BufferGeometry();
+    const verts=new Float32Array([
+      v1.x,v1.y,v1.z, v2.x,v2.y,v2.z, apex.x,apex.y,apex.z
+    ]);
+    g.setAttribute('position',new THREE.BufferAttribute(verts,3));
+    g.computeVertexNormals();
+    const m=new THREE.Mesh(g,M.roof);
+    m.castShadow=true;m.receiveShadow=true;scene.add(m);
+  }
+  const apex=new THREE.Vector3(0,ry+rh,0);
+  const corners=[
+    new THREE.Vector3(-hw,ry,hd),
+    new THREE.Vector3(hw,ry,hd),
+    new THREE.Vector3(hw,ry,-hd),
+    new THREE.Vector3(-hw,ry,-hd),
+  ];
+  roofFace(corners[0],corners[1],apex); // front
+  roofFace(corners[2],corners[3],apex); // back
+  roofFace(corners[3],corners[0],apex); // left
+  roofFace(corners[1],corners[2],apex); // right
+
+  // Ridge tiles along edges
+  function ridgeLine(a,b,segs){
+    for(let i=0;i<segs;i++){
+      const t=(i+0.5)/segs;
+      const x=a.x+(b.x-a.x)*t, y=a.y+(b.y-a.y)*t, z=a.z+(b.z-a.z)*t;
+      C(0.12,0.12,Math.sqrt(Math.pow(b.x-a.x,2)+Math.pow(b.y-a.y,2)+Math.pow(b.z-a.z,2))/segs+0.05,
+        6,M.roofRidge,x,y,z);
+    }
+  }
+}
+hipRoof();
+
+// Ridge cap at top
+C(0.15,0.15,0.5,6,M.roofRidge,0,12.05,0);
+
+// 2 Skylights on roof
+B(2.5,0.25,1.2,M.cornice,-4,10.8,-1);
+B(2.3,0.08,1.0,M.glassBlue,-4,10.93,-1);
+B(2.5,0.25,1.2,M.cornice,4,10.8,-1);
+B(2.3,0.08,1.0,M.glassBlue,4,10.93,-1);
+
+// ─── PEDIMENT / ARCH SIGN ──────────────────────────────────────────────────
+// Semicircular arch above roofline on front facade
+const archCurve=new THREE.Shape();
+archCurve.absarc(0,0,4.5,0,Math.PI,false);
+const archHole=new THREE.Path();
+archHole.absarc(0,0,3.8,0,Math.PI,false);
+archCurve.holes.push(archHole);
+const archGeo=new THREE.ExtrudeGeometry(archCurve,{depth:0.4,bevelEnabled:false});
+const archMesh=new THREE.Mesh(archGeo,M.cornice);
+archMesh.position.set(0,8.7,7.3);
+archMesh.castShadow=true;
+scene.add(archMesh);
+
+// ── CURVED TEXT ON ARCH ────────────────────────────────────────────────────
+(function(){
+  // Create a canvas texture with curved text following the arch
+  const cvs = document.createElement('canvas');
+  cvs.width = 1024; cvs.height = 512;
+  const ctx = cvs.getContext('2d');
+
+  // Transparent background
+  ctx.clearRect(0,0,1024,512);
+
+  // Draw curved text along the top arch
+  const lines = ['ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ', 'ΒΙΒΛΙΟΘΗΚΗ', 'ΜΥΤΙΛΗΝΗΣ'];
+  const cx2 = 512, cy2 = 480; // centre of arc circle (at bottom of canvas)
+  const radii = [390, 310, 240]; // radius for each line
+  const fontSizes = [62, 58, 52];
+
+  lines.forEach((line, li) => {
+    ctx.save();
+    ctx.font = `bold ${fontSizes[li]}px serif`;
+    ctx.fillStyle = '#3a2a0a';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const r = radii[li];
+    const totalAngle = Math.PI * 0.72; // span of text arc
+    const startAngle = Math.PI + totalAngle/2; // start angle (left side)
+    const chars = line.split('');
+    const charAngleStep = totalAngle / (chars.length - 1 || 1);
+
+    chars.forEach((ch, ci) => {
+      const angle = startAngle - ci * charAngleStep;
+      const x = cx2 + r * Math.cos(angle);
+      const y = cy2 + r * Math.sin(angle);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle + Math.PI/2); // rotate char to follow curve
+      ctx.fillText(ch, 0, 0);
+      ctx.restore();
+    });
+    ctx.restore();
+  });
+
+  // Create Three.js texture from canvas
+  const tex = new THREE.CanvasTexture(cvs);
+  tex.needsUpdate = true;
+
+  // Place a flat plane inside the arch to show the text
+  const tMat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false, side:THREE.FrontSide});
+  const tGeo = new THREE.PlaneGeometry(9.0, 4.5);
+  const tMesh = new THREE.Mesh(tGeo, tMat);
+  tMesh.position.set(0, 10.8, 7.52);
+  scene.add(tMesh);
+})();
+
+// ─── ARCHED WINDOWS ────────────────────────────────────────────────────────
+function archWindow(x,y,z,w,h,rot){
+  const g=new THREE.Group();
+  // outer frame
+  const fr=new THREE.Mesh(new THREE.BoxGeometry(w+0.35,h+0.3,0.22),M.winFrame);g.add(fr);
+  // glass panes
+  const gl=new THREE.Mesh(new THREE.BoxGeometry(w,h,0.12),M.glass);gl.position.z=0.06;g.add(gl);
+  // arch top frame
+  for(let a=0;a<=Math.PI;a+=Math.PI/10){
+    const ax=Math.cos(a)*w/2, ay=Math.sin(a)*w/2;
+    const tb=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.18,0.22),M.winFrame);
+    tb.position.set(ax,h/2+ay,0);g.add(tb);
+  }
+  // arch glass top
+  const ag=new THREE.Mesh(new THREE.CylinderGeometry(w/2,w/2,0.12,16,1,false,0,Math.PI),M.glass);
+  ag.rotation.z=Math.PI/2;ag.position.set(0,h/2+w/4,0.06);g.add(ag);
+  // shutters (red panels on sides)
+  const sl=new THREE.Mesh(new THREE.BoxGeometry(w/2,h,0.08),M.shutter);sl.position.set(-w*0.75,0,0.02);g.add(sl);
+  const sr=new THREE.Mesh(new THREE.BoxGeometry(w/2,h,0.08),M.shutter);sr.position.set(w*0.75,0,0.02);g.add(sr);
+  // window sill
+  const sill=new THREE.Mesh(new THREE.BoxGeometry(w+0.7,0.14,0.35),M.cornice);sill.position.set(0,-h/2-0.07,0.1);g.add(sill);
+  g.position.set(x,y,z);if(rot)g.rotation.y=rot;
+  g.traverse(c=>{c.castShadow=true;c.receiveShadow=true;});
+  scene.add(g);return g;
+}
+
+// GROUND FLOOR FRONT — 4 windows + door in centre
+archWindow(-7.5,2.2,7.12,1.4,2.2);
+archWindow(-3.5,2.2,7.12,1.4,2.2);
+archWindow( 3.5,2.2,7.12,1.4,2.2);
+archWindow( 7.5,2.2,7.12,1.4,2.2);
+// SECOND FLOOR FRONT — 4 windows
+archWindow(-7.5,6.4,7.12,1.3,2.0);
+archWindow(-3.5,6.4,7.12,1.3,2.0);
+archWindow( 3.5,6.4,7.12,1.3,2.0);
+archWindow( 7.5,6.4,7.12,1.3,2.0);
+// SIDE WINDOWS LEFT
+archWindow(-11.12,2.2,-2,1.2,2.0,Math.PI/2);
+archWindow(-11.12,2.2, 2,1.2,2.0,Math.PI/2);
+archWindow(-11.12,6.4,-2,1.2,2.0,Math.PI/2);
+archWindow(-11.12,6.4, 2,1.2,2.0,Math.PI/2);
+// SIDE WINDOWS RIGHT
+archWindow( 11.12,2.2,-2,1.2,2.0,-Math.PI/2);
+archWindow( 11.12,2.2, 2,1.2,2.0,-Math.PI/2);
+archWindow( 11.12,6.4,-2,1.2,2.0,-Math.PI/2);
+archWindow( 11.12,6.4, 2,1.2,2.0,-Math.PI/2);
+
+// ─── MAIN ENTRANCE DOOR ────────────────────────────────────────────────────
+// Door arch frame
+const dg=new THREE.Group();
+// frame
+const dfr=new THREE.Mesh(new THREE.BoxGeometry(2.2,4.2,0.25),M.winFrame);dg.add(dfr);
+// Left door panel
+const dl=new THREE.Mesh(new THREE.BoxGeometry(0.95,3.6,0.12),M.door);dl.position.set(-0.55,0.1,0.1);dg.add(dl);
+// Right door panel  
+const dr=new THREE.Mesh(new THREE.BoxGeometry(0.95,3.6,0.12),M.door);dr.position.set(0.55,0.1,0.1);dg.add(dr);
+// door arch top
+const da=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,0.12,16,1,false,0,Math.PI),M.winFrame);
+da.rotation.z=Math.PI/2;da.position.set(0,2.2,0);dg.add(da);
+// Beautiful blue glass transom (mosaic-style)
+const dtg=new THREE.Mesh(new THREE.CylinderGeometry(0.95,0.95,0.1,16,1,false,0,Math.PI),M.transom);
+dtg.rotation.z=Math.PI/2;dtg.position.set(0,2.2,0.06);dg.add(dtg);
+// transom grid
+for(let a=0;a<=Math.PI;a+=Math.PI/6){
+  const tb=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.04,0.06),M.winFrame);
+  tb.position.set(Math.cos(a)*0.85,2.2+Math.sin(a)*0.85,0.1);dg.add(tb);
+}
+dg.position.set(0,2.2,7.13);
+dg.traverse(c=>{c.castShadow=true;});
+scene.add(dg);
+
+// Wall lantern above door
+B(0.12,0.08,0.12,M.lantern,0,5.2,7.3);
+C(0.1,0.12,0.4,6,M.lantern,0,5.0,7.3);
+S(0.12,6,M.glow,0,5.0,7.4);
+const pl=new THREE.PointLight(0xffee88,0.8,6);pl.position.set(0,5.0,7.5);scene.add(pl);
+
+// ─── ENTRANCE STEPS ────────────────────────────────────────────────────────
+// Exterior entrance steps — leading from courtyard UP to front door
+// Step 3 (top, closest to door threshold)
+B(3.2,0.5,0.85,M.stair, 0,0.25,7.65);
+// Step 2 (middle)
+B(3.6,0.35,0.85,M.stair, 0,0.08,8.52);
+// Step 1 (bottom, closest to courtyard)
+B(4.0,0.18,0.85,M.stair, 0,0.04,9.38);
+
+// ─── IRON FENCE & GATE ─────────────────────────────────────────────────────
+const fenceY=0.8, fenceH=1.6;
+// Front fence left of gate
+for(let x=-10;x<-1.5;x+=0.7){
+  B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.4);
+  if(x>-10&&x<-1.5) B(0.06,0.06,0.06,M.iron,x,fenceY+fenceH/2,-7.4);
+}
+B(0.15,fenceH+0.2,0.15,M.fencePost,-10,fenceY,-7.4);
+// top rail
+B(8.5,0.08,0.08,M.iron,-5.8,fenceY+fenceH/2,-7.4);
+B(8.5,0.08,0.08,M.iron,-5.8,fenceY-fenceH/2+0.15,-7.4);
+// Front fence right of gate
+for(let x=1.5;x<=10;x+=0.7){
+  B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.4);
+}
+B(0.15,fenceH+0.2,0.15,M.fencePost,10,fenceY,-7.4);
+B(8.5,0.08,0.08,M.iron,5.8,fenceY+fenceH/2,-7.4);
+B(8.5,0.08,0.08,M.iron,5.8,fenceY-fenceH/2+0.15,-7.4);
+// Gate posts
+B(0.22,fenceH+0.4,0.22,M.fencePost,-1.5,fenceY,-7.4);
+B(0.22,fenceH+0.4,0.22,M.fencePost,1.5,fenceY,-7.4);
+// Gate panels
+for(let x=-1.3;x<0;x+=0.35) B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.38);
+for(let x=0.1;x<=1.3;x+=0.35) B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.38);
+B(1.2,0.08,0.08,M.iron,-0.6,fenceY+0.6,-7.38);
+B(1.2,0.08,0.08,M.iron,0.6,fenceY+0.6,-7.38);
+// Side fences
+for(let z=-7.4;z<=6.5;z+=0.7){
+  B(0.06,fenceH,0.06,M.iron,-10,fenceY,z);
+  B(0.06,fenceH,0.06,M.iron,10,fenceY,z);
+}
+
+// ─── BOXWOOD PLANTS AT ENTRANCE ────────────────────────────────────────────
+function boxwood(x,z){
+  B(0.7,0.5,0.7,M.fence,x,0.25,z); // planter box
+  C(0.45,0.45,0.9,8,M.boxwood,x,0.95,z);
+  C(0.3,0.3,0.5,8,M.boxwood,x,1.55,z);
+}
+boxwood(-2.5,5.5);boxwood(2.5,5.5);
+
+// ─── GREEK FLAG ────────────────────────────────────────────────────────────
+C(0.04,0.04,5.5,6,M.iron,-8,2.75,5.5);
+B(1.6,0.22,0.04,M.flag,-7.2,5.6,5.5);
+B(1.6,0.22,0.04,M.flagW,-7.2,5.38,5.5);
+B(1.6,0.22,0.04,M.flag,-7.2,5.16,5.5);
+B(1.6,0.22,0.04,M.flagW,-7.2,4.94,5.5);
+B(1.6,0.22,0.04,M.flag,-7.2,4.72,5.5);
+
+// ─── ORANGE TREES IN GARDEN ────────────────────────────────────────────────
+function orangeTree(x,z){
+  C(0.18,0.22,3,6,M.treeTrunk,x,1.5,z);
+  C(2.2,2.2,3,10,M.orangeLeaf,x,4.2,z);
+  C(1.6,1.6,2,10,M.orangeLeaf,x,5.6,z);
+  // oranges
+  [-0.8,0,0.8,-0.4,0.4].forEach((ox,i)=>{
+    S(0.18,6,M.orange,x+ox,4.0+i*0.3,z+Math.cos(i)*0.7);
+  });
+}
+orangeTree(-14,0);orangeTree(-16,3);orangeTree(-15,-3);orangeTree(-13,5);
+// Extra bushes
+C(1,1,1.5,8,M.treeLeaf,-14,-3,z=>z||0);
+C(0.8,0.8,1.2,8,M.treeLeaf,-15.5,0.6,-5);
+
+// Small shrubs along building
+for(let x=-9;x<=9;x+=4){
+  C(0.5,0.5,0.8,8,M.treeLeaf,x,0.4,-8.5);
+}
+
+// ─── INTERIOR — GROUND FLOOR ───────────────────────────────────────────────
+// Floors
+B(21.6,0.15,13.6,M.iFloor,0,0.07,0);
+// Interior walls
+B(0.15,4.2,13.6,M.iWall,-10.92,2.1,0);
+B(0.15,4.2,13.6,M.iWall,10.92,2.1,0);
+B(21.6,4.2,0.15,M.iWall,0,2.1,-6.92);
+B(21.6,0.15,13.6,M.iCeil,0,4.22,0);
+// Interior dividing walls
+B(0.15,4.2,6,M.iWall,-4,2.1,-3.5);
+B(0.15,4.2,6,M.iWall,4,2.1,-3.5);
+B(8,4.2,0.15,M.iWall,0,2.1,-0.5);
+
+// ─── BOOKSHELVES ───────────────────────────────────────────────────────────
+const bookMatList=[M.bookR,M.bookB,M.bookG,M.bookY,M.bookBr,M.bookPu,M.bookPg];
+function fillShelf(sx,sy,sz,sw,rot){
+  // shelf unit back panel
+  const back=new THREE.Mesh(new THREE.BoxGeometry(sw,3.2,0.18),M.shelf);
+  back.position.set(sx,sy+1.6,sz);if(rot)back.rotation.y=rot;
+  back.castShadow=true;back.receiveShadow=true;scene.add(back);
+  // 4 shelves
+  for(let s=0;s<4;s++){
+    const sh=new THREE.Mesh(new THREE.BoxGeometry(sw,0.08,0.42),M.shelfDark);
+    sh.position.set(sx,sy+0.3+s*0.95,sz);if(rot)sh.rotation.y=rot;
+    sh.castShadow=true;scene.add(sh);
+    // books
+    let boff=-sw/2+0.06;
+    while(boff<sw/2-0.06){
+      const bw=0.06+Math.random()*0.1;
+      const bh=0.5+Math.random()*0.35;
+      const bmat=bookMatList[Math.floor(Math.random()*bookMatList.length)];
+      const book=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,0.3),bmat);
+      const offset=rot?new THREE.Vector3(0,sy+0.3+s*0.95+0.04+bh/2,0):
+                       new THREE.Vector3(sx+boff+bw/2,sy+0.3+s*0.95+0.04+bh/2,sz+0.08);
+      if(rot){
+        book.position.set(sx+Math.cos(rot)*(boff+bw/2),sy+0.3+s*0.95+0.04+bh/2,sz+Math.sin(rot)*(boff+bw/2));
+      } else {
+        book.position.set(sx+boff+bw/2,sy+0.3+s*0.95+0.04+bh/2,sz+0.08);
+      }
+      book.castShadow=true;scene.add(book);
+      boff+=bw+0.01;
+    }
+  }
+}
+
+// Ground floor shelves along walls
+// Ground floor — left wall shelves (x moved inward from -9.8 to -9.3)
+fillShelf(-9.3,0,-4,3.2);
+fillShelf(-9.3,0,0,3.2);
+fillShelf(-9.3,0,4,3.2);
+// Ground floor — right wall shelves
+fillShelf(9.3,0,-4,3.2);
+fillShelf(9.3,0,0,3.2);
+fillShelf(9.3,0,4,3.2);
+// Ground floor — back wall shelves (z moved inward from -6.7 to -6.1)
+fillShelf(-3.5,0,-6.1,3.0,Math.PI/2);
+fillShelf(3.5,0,-6.1,3.0,Math.PI/2);
+
+// ─── READING TABLES ────────────────────────────────────────────────────────
+function readingTable(x,y,z){
+  B(3.0,0.1,1.2,M.table,x,y+0.78,z);
+  [[-1.1,-0.45],[1.1,-0.45],[-1.1,0.45],[1.1,0.45]].forEach(([ox,oz])=>{
+    B(0.07,0.78,0.07,M.table,x+ox,y+0.35,z+oz);
+  });
+  // books on table
+  B(0.3,0.04,0.22,M.bookR,x-0.5,y+0.84,z);
+  B(0.3,0.04,0.22,M.bookB,x+0.4,y+0.84,z-0.1);
+  B(0.08,0.3,0.22,M.bookG,x+0.7,y+0.84,z,0.3);
+}
+readingTable(-2.5,0,2.5);
+readingTable(2.5,0,2.5);
+readingTable(0,0,2.5);
+
+// ─── STAIRCASE ─────────────────────────────────────────────────────────────
+// Interior staircase — back-left corner, ascending from z=-5 to z=-1.5, going UP
+for(let s=0;s<9;s++){
+  // Each step: as s increases, z increases (going toward front = z direction)
+  // and y increases (going up)
+  B(2.8,0.15,0.55,M.stair, -7.8, 0.22+s*0.47, -5.2+s*0.55);
+}
+// Stair landing at top
+B(2.8,0.15,1.0,M.stair,-7.8,4.44,-1.3);
+// stair side wall enclosure
+B(0.12,4.4,4.8,M.iWall,-6.3,2.2,-2.8);
+// Railings along staircase
+for(let s=0;s<10;s++){
+  B(0.06,0.9,0.06,M.iron,-6.38,0.65+s*0.47,-5.2+s*0.55);
+  B(0.06,0.9,0.06,M.iron,-9.18,0.65+s*0.47,-5.2+s*0.55);
+}
+// Handrail top bar
+B(0.06,0.06,5.5,M.iron,-6.38,4.55,-2.8);
+B(0.06,0.06,5.5,M.iron,-9.18,4.55,-2.8);
+
+// ─── SECOND FLOOR ──────────────────────────────────────────────────────────
+B(21.6,0.15,13.6,M.iFloor,0,4.27,0);
+// Second floor walls
+B(0.15,4.0,13.6,M.iWall,-10.92,6.3,0);
+B(0.15,4.0,13.6,M.iWall,10.92,6.3,0);
+B(21.6,4.0,0.15,M.iWall,0,6.3,-6.92);
+B(21.6,0.15,13.6,M.iCeil,0,8.32,0);
+// Second floor bookshelves
+// Second floor — left wall shelves
+fillShelf(-9.3,4.27,-4,3.2);
+fillShelf(-9.3,4.27,0,3.2);
+fillShelf(-9.3,4.27,4,3.2);
+// Second floor — right wall shelves
+fillShelf(9.3,4.27,-4,3.2);
+fillShelf(9.3,4.27,0,3.2);
+fillShelf(9.3,4.27,4,3.2);
+// Second floor — back wall shelves
+fillShelf(-3.5,4.27,-6.1,3.0,Math.PI/2);
+fillShelf(3.5,4.27,-6.1,3.0,Math.PI/2);
+fillShelf(0,4.27,-6.1,3.0,Math.PI/2);
+// Second floor reading tables
+readingTable(-3,4.27,2);
+readingTable(3,4.27,2);
+
+// Second floor interior lights
+const il1=new THREE.PointLight(0xffeecc,0.5,10);il1.position.set(0,7.5,-2);scene.add(il1);
+const il2=new THREE.PointLight(0xffeecc,0.4,10);il2.position.set(0,3.5,-2);scene.add(il2);
+
+// ─── SURROUNDINGS ──────────────────────────────────────────────────────────
+// Pavement in front
+B(22,0.06,8,M.pebble,0,0.03,-11.5);
+// Street lamps
+function streetLamp(x,z){
+  C(0.06,0.08,5,6,M.iron,x,2.5,z);
+  B(0.1,0.08,0.6,M.iron,x,5.1,z+0.25);
+  C(0.2,0.2,0.15,8,M.lantern,x,5.25,z+0.5);
+  S(0.15,8,M.glow,x,5.25,z+0.5);
+  const lp=new THREE.PointLight(0xffdd66,0.7,9);lp.position.set(x,5.3,z+0.5);scene.add(lp);
+}
+streetLamp(-13,-12);streetLamp(13,-12);
+
+// Nearby buildings
+B(12,14,14,new THREE.MeshLambertMaterial({color:0xe0d4c0}),22,7,0);
+B(10,10,14,new THREE.MeshLambertMaterial({color:0xd8cbb8}),-21,5,0);
+B(14,0.5,14,new THREE.MeshLambertMaterial({color:0x9a6040}),22,14.25,0);
+B(10,0.5,14,new THREE.MeshLambertMaterial({color:0x9a6040}),-21,10.25,0);
+
+// Road markings
+B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),0,0.02,-18.5);
+B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),3.5,0.02,-18.5);
+B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),-3.5,0.02,-18.5);
+
+// Garden sign post
+C(0.05,0.05,1.2,6,M.iron,-11.5,0.6,-6);
+B(1.2,0.6,0.06,new THREE.MeshLambertMaterial({color:0xf5f0e0}),-11.5,1.5,-6);
+
+// ─── CAMERA ORBIT CONTROLS ─────────────────────────────────────────────────
+let drag=false,rDrag=false,px=0,py=0;
+let sph={th:0.55,ph:1.05,r:38};
+let tgt=new THREE.Vector3(0,4,0);
+let aTgt=null, animating=false;
+
+function updateCam(){
+  cam.position.x=tgt.x+sph.r*Math.sin(sph.ph)*Math.sin(sph.th);
+  cam.position.y=tgt.y+sph.r*Math.cos(sph.ph);
+  cam.position.z=tgt.z+sph.r*Math.sin(sph.ph)*Math.cos(sph.th);
+  cam.lookAt(tgt);
+}
+updateCam();
+
+renderer.domElement.addEventListener('mousedown',e=>{drag=true;rDrag=e.button===2;px=e.clientX;py=e.clientY;});
+renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('mousemove',e=>{
+  if(!drag)return;
+  const dx=(e.clientX-px)*0.007,dy=(e.clientY-py)*0.007;
+  if(rDrag){
+    const r=new THREE.Vector3();cam.getWorldDirection(r);r.cross(cam.up).normalize();
+    tgt.addScaledVector(r,-dx*4);tgt.y+=dy*4;
+  } else {
+    sph.th-=dx;sph.ph=Math.max(0.1,Math.min(1.5,sph.ph+dy));
+  }
+  px=e.clientX;py=e.clientY;updateCam();
+});
+document.addEventListener('mouseup',()=>drag=false);
+renderer.domElement.addEventListener('wheel',e=>{
+  sph.r=Math.max(4,Math.min(90,sph.r+e.deltaY*0.04));
+  if(animating)animating=false;
+  updateCam();
+},{passive:true});
+// touch
+let lt=null;
+renderer.domElement.addEventListener('touchstart',e=>{lt={x:e.touches[0].clientX,y:e.touches[0].clientY};});
+renderer.domElement.addEventListener('touchmove',e=>{
+  if(!lt)return;
+  sph.th-=(e.touches[0].clientX-lt.x)*0.01;
+  sph.ph=Math.max(0.1,Math.min(1.5,sph.ph+(e.touches[0].clientY-lt.y)*0.01));
+  lt={x:e.touches[0].clientX,y:e.touches[0].clientY};updateCam();
+});
+
+// ─── VIEW PRESETS ──────────────────────────────────────────────────────────
+const VIEWS={
+  street: {th:0.55,ph:1.05,r:38,tx:0,ty:4,tz:0,
+    title:'Street View / Θέα από τον Δρόμο',
+    desc:'The library as seen from Smyrnis Street. White plastered two-storey building with terracotta hip roof, burgundy arched windows, iron gate and lush orange trees in the garden.'},
+  front:  {th:0.0,ph:1.08,r:22,tx:0,ty:5,tz:2,
+    title:'Front Facade / Πρόσοψη',
+    desc:'The neoclassical facade features the semicircular pediment inscribed "ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ ΒΙΒΛΙΟΘΗΚΗ ΜΥΤΙΛΗΝΗΣ", the ornate red door with blue glass transom, and symmetrical arched windows with red shutters.'},
+  inside1:{th:0.05,ph:1.38,r:14,tx:0,ty:2.5,tz:-1,
+    title:'Ground Floor / Ισόγειο',
+    desc:'The ground floor reading hall with wooden bookshelves lining the walls, study tables, and the internal staircase leading to the first floor. Houses over 55,000 volumes.'},
+  inside2:{th:0.05,ph:1.35,r:14,tx:0,ty:6.8,tz:-1,
+    title:'First Floor / Πρώτος Όροφος',
+    desc:'The first floor contains the rare collections including the Vernardakis archive, the Lefkias historical archive, academic journals, and the digital catalogue terminal.'},
+  aerial: {th:0.5,ph:0.15,r:58,tx:0,ty:0,tz:0,
+    title:'Aerial View / Αεροφωτογραφία',
+    desc:'Looking down at the hip roof with its characteristic X-pattern ridges and two skylights. The pebble courtyard, iron fence, garden with orange trees and surrounding street are all visible.'},
+  garden: {th:-1.3,ph:1.1,r:26,tx:-10,ty:4,tz:0,
+    title:'Garden Side / Κήπος',
+    desc:'The left side of the building with the garden, orange trees, and the side entrance. This area was part of the original Doukarou clinic grounds dating back to the early 20th century.'},
+};
+
+function goView(name){
+  document.querySelectorAll('.vb').forEach(b=>b.classList.remove('on'));
+  event.target.classList.add('on');
+  aTgt={...VIEWS[name]};animating=true;
+  document.getElementById('ititle').textContent=VIEWS[name].title;
+  document.getElementById('idesc').textContent=VIEWS[name].desc;
+}
+
+function lerp(a,b,t){return a+(b-a)*t}
+
+// ─── ANIMATE ───────────────────────────────────────────────────────────────
+function animate(){
+  requestAnimationFrame(animate);
+  if(animating&&aTgt){
+    const sp=0.045;
+    sph.th=lerp(sph.th,aTgt.th,sp);
+    sph.ph=lerp(sph.ph,aTgt.ph,sp);
+    sph.r=lerp(sph.r,aTgt.r,sp);
+    tgt.x=lerp(tgt.x,aTgt.tx,sp);
+    tgt.y=lerp(tgt.y,aTgt.ty,sp);
+    tgt.z=lerp(tgt.z,aTgt.tz,sp);
+    if(Math.abs(sph.th-aTgt.th)+Math.abs(sph.ph-aTgt.ph)+Math.abs(sph.r-aTgt.r)<0.002)animating=false;
+    updateCam();
+  }
+  // gentle lantern flicker
+  pl.intensity=0.75+Math.sin(Date.now()*0.003)*0.08;
+  renderer.render(scene,cam);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+  cam.aspect=window.innerWidth/window.innerHeight;
+  cam.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+document.getElementById('loading').style.display='none';
+</script>
+
+</body>
+</html>
