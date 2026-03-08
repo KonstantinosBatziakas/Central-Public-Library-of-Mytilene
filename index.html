@@ -129,35 +129,10 @@ section{padding:clamp(60px,8vw,120px) clamp(20px,5vw,60px)}
 .contact-info-value-gr{font-size:0.76rem;color:rgba(245,240,232,0.35);font-style:italic;margin-top:2px}
 
 /* 3D MODEL SECTION */
-#model3d {
-background: var(–dark);
-padding: 0;
-position: relative;
-}
-.model-header {
-padding: clamp(40px,6vw,80px) clamp(20px,5vw,60px) 40px;
-max-width: 1200px;
-margin: 0 auto;
-}
-.model-embed {
-width: 100%;
-height: 75vh;min-height:400px;
-border: none;
-display: block;
-border-top: 1px solid rgba(184,149,42,0.15);
-border-bottom: 1px solid rgba(184,149,42,0.15);
-}
-.model-caption {
-padding: 20px clamp(20px,5vw,60px) 40px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-max-width: 1200px;
-margin: 0 auto;
-font-size: 0.68rem;
-color: rgba(245,240,232,0.3);
-letter-spacing: 0.1em;
-}
+#model3d{background:var(–dark);padding:0;position:relative}
+.model-header{padding:clamp(40px,6vw,80px) clamp(20px,5vw,60px) 40px;max-width:1200px;margin:0 auto}
+.model-embed{width:100%;height:75vh;min-height:400px;border:none;display:block;border-top:1px solid rgba(184,149,42,0.15);border-bottom:1px solid rgba(184,149,42,0.15)}
+.model-caption{padding:20px clamp(20px,5vw,60px) 40px;display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;font-size:0.68rem;color:rgba(245,240,232,0.3);letter-spacing:0.1em}
 
 footer{background:#0a0908;padding:44px 60px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(184,149,42,0.12)}
 .footer-logo{font-family:‘Cormorant Garamond’,serif;font-size:0.92rem;color:rgba(245,240,232,0.35);letter-spacing:0.04em}
@@ -182,46 +157,11 @@ footer{background:#0a0908;padding:44px 60px;display:flex;justify-content:space-b
 nav{padding:16px 20px!important}
 nav.scrolled{padding:12px 20px!important}
 .lang-toggle{font-size:0.55rem;padding:5px 10px}
-}
-@media(max-width:768px){
-nav{padding:16px 24px}nav.scrolled{padding:12px 24px}.nav-links{display:none}
 section{padding:80px 24px}
 .about-grid,.hours-container{grid-template-columns:1fr;gap:48px}
 .collections-grid{grid-template-columns:1fr}
 .event-item{grid-template-columns:1fr;gap:16px}
 .event-date-block{border-right:none;border-bottom:1px solid var(–border);padding:0 0 16px;text-align:left}
-
-/* 3D MODEL SECTION */
-#model3d {
-background: var(–dark);
-padding: 0;
-position: relative;
-}
-.model-header {
-padding: clamp(40px,6vw,80px) clamp(20px,5vw,60px) 40px;
-max-width: 1200px;
-margin: 0 auto;
-}
-.model-embed {
-width: 100%;
-height: 75vh;min-height:400px;
-border: none;
-display: block;
-border-top: 1px solid rgba(184,149,42,0.15);
-border-bottom: 1px solid rgba(184,149,42,0.15);
-}
-.model-caption {
-padding: 20px clamp(20px,5vw,60px) 40px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-max-width: 1200px;
-margin: 0 auto;
-font-size: 0.68rem;
-color: rgba(245,240,232,0.3);
-letter-spacing: 0.1em;
-}
-
 footer{flex-direction:column;gap:14px;text-align:center}
 }
 </style>
@@ -242,7 +182,9 @@ footer{flex-direction:column;gap:14px;text-align:center}
   <a href="#contact" onclick="closeMobileMenu()">Contact</a>
   <a href="#model3d" onclick="closeMobileMenu()">3D Model</a>
 </div>
+
 <!-- NAV -->
+
 <nav id="navbar">
   <a href="#hero" class="nav-logo">
     ΔΚΒΜ
@@ -486,7 +428,7 @@ footer{flex-direction:column;gap:14px;text-align:center}
     <p class="section-label reveal" data-en="Useful Information" data-gr="Χρήσιμες Πληροφορίες">Useful Information</p>
     <h2 class="section-title reveal" data-en="Find the<br><em>Library</em>" data-gr="Βρείτε τη<br><em>Βιβλιοθήκη</em>">Find the<br><em>Library</em></h2>
     <div class="section-divider reveal"></div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-top:8px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))" class="reveal reveal-delay-1">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;margin-top:8px" class="reveal reveal-delay-1">
       <div class="contact-info-item">
         <div class="contact-info-label" data-en="Address" data-gr="Διεύθυνση">Address</div>
         <div class="contact-info-value">Smyrnis Street, Mytilene 811 00</div>
@@ -543,14 +485,6 @@ footer{flex-direction:column;gap:14px;text-align:center}
 </footer>
 
 <script>
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-  setTimeout(() => { ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px'; }, 80);
-});
-
 window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
 });
@@ -570,7 +504,6 @@ document.getElementById('langToggle').addEventListener('click', () => {
   document.querySelectorAll('.collection-title-gr, .event-gr, .about-stat-gr, .hours-day-gr, .contact-info-value-gr').forEach(el => {
     el.style.display = isGreek ? 'none' : 'block';
   });
-  // Switch day-of-week text
   document.querySelectorAll('.hours-day[data-en][data-gr]').forEach(el => {
     const gr = el.getAttribute('data-gr');
     const en = el.getAttribute('data-en');
@@ -587,7 +520,6 @@ document.getElementById('langToggle').addEventListener('click', () => {
   document.documentElement.lang = isGreek ? 'el' : 'en';
 });
 
-// Mobile menu
 document.getElementById('hamburger').addEventListener('click',()=>{
   document.getElementById('mobileMenu').classList.add('open');
 });
