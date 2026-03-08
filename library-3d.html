@@ -254,58 +254,55 @@ archMesh.position.set(0,8.7,7.3);
 archMesh.castShadow=true;
 scene.add(archMesh);
 
-// ── CURVED TEXT ON ARCH ────────────────────────────────────────────────────
+// ── CURVED TEXT ON ARCH using Sprites ─────────────────────────────────────
 (function(){
-  // Create a canvas texture with curved text following the arch
-  const cvs = document.createElement('canvas');
-  cvs.width = 1024; cvs.height = 512;
-  const ctx = cvs.getContext('2d');
+  // The arch centre in 3D space: x=0, y=8.7 (base of arch), z=7.55 (front face)
+  // Arch radius = 4.5 units in 3D
+  // We place sprites for each character along the arc
 
-  // Transparent background
-  ctx.clearRect(0,0,1024,512);
-
-  // Draw curved text along the top arch
-  const lines = ['ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ', 'ΒΙΒΛΙΟΘΗΚΗ', 'ΜΥΤΙΛΗΝΗΣ'];
-  const cx2 = 512, cy2 = 480; // centre of arc circle (at bottom of canvas)
-  const radii = [390, 310, 240]; // radius for each line
-  const fontSizes = [62, 58, 52];
-
-  lines.forEach((line, li) => {
-    ctx.save();
-    ctx.font = `bold ${fontSizes[li]}px serif`;
-    ctx.fillStyle = '#3a2a0a';
+  function makeCharSprite(ch, fontSize, color){
+    const cvs = document.createElement('canvas');
+    cvs.width = 128; cvs.height = 128;
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,128,128);
+    ctx.font = `bold ${fontSize}px Georgia, serif`;
+    ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.fillText(ch, 64, 64);
+    const tex = new THREE.CanvasTexture(cvs);
+    tex.needsUpdate = true;
+    const mat = new THREE.SpriteMaterial({map:tex, transparent:true, depthWrite:false});
+    const sprite = new THREE.Sprite(mat);
+    return sprite;
+  }
 
-    const r = radii[li];
-    const totalAngle = Math.PI * 0.72; // span of text arc
-    const startAngle = Math.PI + totalAngle/2; // start angle (left side)
-    const chars = line.split('');
-    const charAngleStep = totalAngle / (chars.length - 1 || 1);
-
-    chars.forEach((ch, ci) => {
-      const angle = startAngle - ci * charAngleStep;
-      const x = cx2 + r * Math.cos(angle);
-      const y = cy2 + r * Math.sin(angle);
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(angle + Math.PI/2); // rotate char to follow curve
-      ctx.fillText(ch, 0, 0);
-      ctx.restore();
+  // archCX, archCY in 3D = (0, 8.7), archR = 4.5, z = 7.58
+  // angles: 0=right, PI/2=top, PI=left  — we want text along top half
+  function placeTextOnArc(text, arcCX, arcCY, arcZ, arcR, midAngle, totalSpan, spriteScale, fontSize){
+    const chars = text.split('');
+    const n = chars.length;
+    chars.forEach((ch, i) => {
+      const t   = n === 1 ? 0 : (i / (n - 1) - 0.5); // -0.5 to 0.5
+      const ang = midAngle + t * totalSpan;
+      const x   = arcCX + arcR * Math.cos(ang);
+      const y   = arcCY + arcR * Math.sin(ang);
+      const sp  = makeCharSprite(ch, fontSize, '#2d1a06');
+      sp.scale.set(spriteScale, spriteScale, 1);
+      sp.position.set(x, y, arcZ);
+      scene.add(sp);
     });
-    ctx.restore();
-  });
+  }
 
-  // Create Three.js texture from canvas
-  const tex = new THREE.CanvasTexture(cvs);
-  tex.needsUpdate = true;
+  const AX=0, AY=8.7, AZ=7.62, AR=4.5;
+  const TOP = Math.PI/2; // 90° = top of arch
 
-  // Place a flat plane inside the arch to show the text
-  const tMat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false, side:THREE.FrontSide});
-  const tGeo = new THREE.PlaneGeometry(9.0, 4.5);
-  const tMesh = new THREE.Mesh(tGeo, tMat);
-  tMesh.position.set(0, 10.8, 7.52);
-  scene.add(tMesh);
+  // Line 1: ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ — outer ring, r=4.0, wide arc
+  placeTextOnArc('ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ', AX, AY, AZ, 4.0, TOP, 2.2, 0.55, 80);
+  // Line 2: ΒΙΒΛΙΟΘΗΚΗ — middle ring, r=3.2
+  placeTextOnArc('ΒΙΒΛΙΟΘΗΚΗ',       AX, AY, AZ, 3.2, TOP, 1.8, 0.52, 80);
+  // Line 3: ΜΥΤΙΛΗΝΗΣ — inner ring, r=2.3
+  placeTextOnArc('ΜΥΤΙΛΗΝΗΣ',        AX, AY, AZ, 2.3, TOP, 1.5, 0.50, 80);
 })();
 
 // ─── ARCHED WINDOWS ────────────────────────────────────────────────────────
