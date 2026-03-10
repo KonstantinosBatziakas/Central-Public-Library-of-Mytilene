@@ -141,14 +141,14 @@ section{padding:clamp(64px,8vw,120px) clamp(24px,5vw,60px)}
 /* ── CONTACT (dark) ───────────────────────────── */
 #contact{background:#111009}
 .contact-inner{max-width:1200px;margin:0 auto}
-.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:rgba(184,149,42,0.07);margin-top:44px}
-.contact-info-item{padding:28px 30px;background:#111009}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:transparent;margin-top:44px;border:1px solid rgba(184,149,42,0.12)}
+.contact-info-item{padding:28px 30px;background:#111009;border:1px solid rgba(184,149,42,0.08)}
 .contact-info-label{font-size:0.55rem;letter-spacing:0.24em;text-transform:uppercase;color:#b8952a;margin-bottom:10px;font-weight:600}
 .contact-info-value{font-family:'Cormorant Garamond',serif;font-size:1.08rem;color:#f5f0e8;font-weight:300;line-height:1.5}
 .contact-info-value-gr{font-size:0.74rem;color:rgba(245,240,232,0.3);font-style:italic;margin-top:4px}
 
 /* ── 3D MODEL (dark) ──────────────────────────── */
-#model3d{background:#0e0c0a;padding:0}
+#model-section{background:#0e0c0a;padding:0}
 .model-header{padding:clamp(48px,7vw,90px) clamp(24px,5vw,60px) 44px;max-width:1200px;margin:0 auto}
 .model-desc{font-size:0.8rem;color:rgba(245,240,232,0.4);font-weight:300;line-height:1.85;max-width:580px}
 .model-embed{width:100%;height:75vh;min-height:420px;border:none;display:block;border-top:1px solid rgba(184,149,42,0.12);border-bottom:1px solid rgba(184,149,42,0.12)}
@@ -192,7 +192,7 @@ footer{background:#080706;padding:44px 60px;display:flex;justify-content:space-b
   <a href="#hours" onclick="closeMobileMenu()" data-en="Hours" data-gr="Ώρες">Hours</a>
   <a href="#events" onclick="closeMobileMenu()" data-en="Events" data-gr="Εκδηλώσεις">Events</a>
   <a href="#contact" onclick="closeMobileMenu()" data-en="Contact" data-gr="Επικοινωνία">Contact</a>
-  <a href="#model3d" onclick="closeMobileMenu()" data-en="3D Model" data-gr="3D Μοντέλο">3D Model</a>
+  <a href="#model-section" onclick="closeMobileMenu()" data-en="3D Model" data-gr="3D Μοντέλο">3D Model</a>
 </div>
 
 <!-- NAV -->
@@ -207,7 +207,7 @@ footer{background:#080706;padding:44px 60px;display:flex;justify-content:space-b
     <li><a href="#hours" data-en="Hours" data-gr="Ώρες">Hours</a></li>
     <li><a href="#events" data-en="Events" data-gr="Εκδηλώσεις">Events</a></li>
     <li><a href="#contact" data-en="Contact" data-gr="Επικοινωνία">Contact</a></li>
-    <li><a href="#model3d" data-en="3D Model" data-gr="3D Μοντέλο">3D Model</a></li>
+    <li><a href="#model-section" data-en="3D Model" data-gr="3D Μοντέλο">3D Model</a></li>
   </ul>
   <button class="lang-toggle" id="langToggle">EN / ΕΛ</button>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -467,14 +467,14 @@ footer{background:#080706;padding:44px 60px;display:flex;justify-content:space-b
 </section>
 
 <!-- ═══ 3D MODEL (dark) ═══ -->
-<section id="model3d" style="padding:0;background:#0e0c0a">
+<section id="model-section" style="padding:0;background:#0e0c0a">
   <div class="model-header on-dark">
     <p class="section-label" data-en="Interactive 3D Model" data-gr="Διαδραστικό 3D Μοντέλο">Interactive 3D Model</p>
     <h2 class="section-title" data-en="Explore the Building<br><em>in 3D</em>" data-gr="Εξερευνήστε το Κτήριο<br><em>σε 3D</em>">Explore the Building<br><em>in 3D</em></h2>
     <div class="section-divider"></div>
     <p class="model-desc" data-en="An interactive 3D reconstruction of the Public Central Library of Mytilene. Explore both floors, the bookshelves, the reading halls, the neoclassical facade and the garden. Drag to rotate · Scroll to zoom · Right-drag to pan." data-gr="Ένα διαδραστικό 3D μοντέλο της Δημόσιας Κεντρικής Βιβλιοθήκης Μυτιλήνης. Εξερευνήστε και τους δύο ορόφους, τα ράφια, τις αίθουσες και τον κήπο.">An interactive 3D reconstruction of the Public Central Library of Mytilene. Explore both floors, the bookshelves, the reading halls, the neoclassical facade and the garden. Drag to rotate · Scroll to zoom · Right-drag to pan.</p>
   </div>
-  <iframe class="model-embed" id="model3d" src="library-3d.html" title="3D Model of the Library" allowfullscreen onload="syncIframeLang()"></iframe>
+  <iframe class="model-embed" id="model-iframe" src="library-3d.html" title="3D Model of the Library" allowfullscreen></iframe>
   <div class="model-caption">
     <span data-en="3D model based on actual photographs of the building · Built with Three.js" data-gr="3D μοντέλο βασισμένο σε φωτογραφίες του κτηρίου · Κατασκευάστηκε με Three.js">3D model based on actual photographs of the building · Built with Three.js</span>
     <span>© 2026 · Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης</span>
@@ -496,16 +496,25 @@ window.addEventListener('scroll',()=>{
 let isGreek = false;
 
 function syncIframeLang(){
-  const iframe = document.getElementById('model3d');
-  if(iframe && iframe.contentWindow){
-    iframe.contentWindow.postMessage({type:'setLanguage', greek:isGreek}, '*');
-  }
+  const iframe = document.getElementById('model-iframe');
+  if(!iframe) return;
+  try{ iframe.contentWindow.postMessage({type:'setLanguage', greek:isGreek}, '*'); }catch(e){}
 }
 
 /* When iframe signals it's ready, send current language immediately */
 window.addEventListener('message', e=>{
   if(e.data && e.data.type==='iframeReady'){
     syncIframeLang();
+  }
+});
+
+/* Also send on iframe load event (belt + suspenders) */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const iframe = document.getElementById('model-iframe');
+  if(iframe){
+    iframe.addEventListener('load', ()=>{
+      setTimeout(syncIframeLang, 100);
+    });
   }
 });
 
