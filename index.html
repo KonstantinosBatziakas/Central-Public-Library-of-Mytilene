@@ -474,7 +474,7 @@ footer{background:#080706;padding:44px 60px;display:flex;justify-content:space-b
     <div class="section-divider"></div>
     <p class="model-desc" data-en="An interactive 3D reconstruction of the Public Central Library of Mytilene. Explore both floors, the bookshelves, the reading halls, the neoclassical facade and the garden. Drag to rotate · Scroll to zoom · Right-drag to pan." data-gr="Ένα διαδραστικό 3D μοντέλο της Δημόσιας Κεντρικής Βιβλιοθήκης Μυτιλήνης. Εξερευνήστε και τους δύο ορόφους, τα ράφια, τις αίθουσες και τον κήπο.">An interactive 3D reconstruction of the Public Central Library of Mytilene. Explore both floors, the bookshelves, the reading halls, the neoclassical facade and the garden. Drag to rotate · Scroll to zoom · Right-drag to pan.</p>
   </div>
-  <iframe class="model-embed" src="library-3d.html" title="3D Model of the Library" allowfullscreen></iframe>
+  <iframe class="model-embed" id="model3d" src="library-3d.html" title="3D Model of the Library" allowfullscreen onload="syncIframeLang()"></iframe>
   <div class="model-caption">
     <span data-en="3D model based on actual photographs of the building · Built with Three.js" data-gr="3D μοντέλο βασισμένο σε φωτογραφίες του κτηρίου · Κατασκευάστηκε με Three.js">3D model based on actual photographs of the building · Built with Three.js</span>
     <span>© 2026 · Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης</span>
@@ -494,6 +494,21 @@ window.addEventListener('scroll',()=>{
 
 /* ── LANGUAGE TOGGLE ── */
 let isGreek = false;
+
+function syncIframeLang(){
+  const iframe = document.getElementById('model3d');
+  if(iframe && iframe.contentWindow){
+    iframe.contentWindow.postMessage({type:'setLanguage', greek:isGreek}, '*');
+  }
+}
+
+/* When iframe signals it's ready, send current language immediately */
+window.addEventListener('message', e=>{
+  if(e.data && e.data.type==='iframeReady'){
+    syncIframeLang();
+  }
+});
+
 document.getElementById('langToggle').addEventListener('click',()=>{
   isGreek = !isGreek;
   document.querySelectorAll('[data-en][data-gr]').forEach(el=>{
@@ -505,11 +520,7 @@ document.getElementById('langToggle').addEventListener('click',()=>{
   });
   document.getElementById('langToggle').textContent = isGreek ? 'ΕΛ / EN' : 'EN / ΕΛ';
   document.documentElement.lang = isGreek ? 'el' : 'en';
-  /* tell the 3D model iframe to switch language */
-  const iframe = document.querySelector('.model-embed');
-  if(iframe && iframe.contentWindow){
-    iframe.contentWindow.postMessage({type:'setLanguage', greek:isGreek}, '*');
-  }
+  syncIframeLang();
 });
 
 /* ── MOBILE MENU ── */
