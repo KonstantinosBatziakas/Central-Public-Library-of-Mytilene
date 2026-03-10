@@ -505,6 +505,11 @@ document.getElementById('langToggle').addEventListener('click',()=>{
   });
   document.getElementById('langToggle').textContent = isGreek ? 'ΕΛ / EN' : 'EN / ΕΛ';
   document.documentElement.lang = isGreek ? 'el' : 'en';
+  /* tell the 3D model iframe to switch language */
+  const iframe = document.querySelector('.model-embed');
+  if(iframe && iframe.contentWindow){
+    iframe.contentWindow.postMessage({type:'setLanguage', greek:isGreek}, '*');
+  }
 });
 
 /* ── MOBILE MENU ── */
