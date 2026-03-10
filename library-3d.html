@@ -551,6 +551,15 @@ window.addEventListener('message',e=>{
   }
 });
 
+/* On load, ask parent what language is currently active */
+window.addEventListener('load',()=>{
+  try{
+    if(window.parent&&window.parent!==window){
+      window.parent.postMessage({type:'iframeReady'},'*');
+    }
+  }catch(err){}
+});
+
 function lerp(a,b,t){return a+(b-a)*t}
 
 function animate(){
