@@ -551,14 +551,16 @@ window.addEventListener('message',e=>{
   }
 });
 
-/* On load, ask parent what language is currently active */
-window.addEventListener('load',()=>{
+/* Tell parent we are ready, and also check URL ?lang=gr param as fallback */
+(function(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('lang')==='gr') applyLanguage(true);
   try{
     if(window.parent&&window.parent!==window){
       window.parent.postMessage({type:'iframeReady'},'*');
     }
   }catch(err){}
-});
+})();
 
 function lerp(a,b,t){return a+(b-a)*t}
 
