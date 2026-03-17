@@ -618,9 +618,13 @@ window.addEventListener('message',e=>{
     }
   }catch(err){}
 })();
-
-function lerp(a,b,t){return a+(b-a)*t}
+  
 document.getElementById('loading').style.display = 'none';
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, cam);
+}
+animate();
 function animate(){
   requestAnimationFrame(animate);
   if(animating&&aTgt){
