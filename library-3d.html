@@ -482,6 +482,17 @@ renderer.domElement.addEventListener('wheel',e=>{
   if(animating)animating=false;
   updateCam();
 },{passive:true});
+// Zoom button JS (insert here)
+let zoomedIn = false;
+document.getElementById('zoomBtn').addEventListener('click', () => {
+  zoomedIn = !zoomedIn;
+  sph.r = zoomedIn ? 8 : VIEWS.street.r; // or another default distance
+  updateCam();
+  document.getElementById('zoomBtn').textContent = zoomedIn ? '🔎' : '🔍';
+});
+
+let lt=null;
+renderer.domElement.addEventListener('touchstart',e=>{lt={x:e.touches[0].clientX,y:e.touches[0].clientY};});
 let lt=null;
 renderer.domElement.addEventListener('touchstart',e=>{lt={x:e.touches[0].clientX,y:e.touches[0].clientY};});
 renderer.domElement.addEventListener('touchmove',e=>{
