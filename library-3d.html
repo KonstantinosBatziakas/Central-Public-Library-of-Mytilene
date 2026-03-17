@@ -549,6 +549,21 @@ function goView(name,e){
   document.getElementById('idesc').textContent=isGreek?VIEWS[name].desc_gr:VIEWS[name].desc_en;
 }
 
+  document.getElementById('zoomBtn').addEventListener('click', () => {
+  zoomedIn = !zoomedIn;
+
+  aTgt = {
+    th: sph.th,
+    ph: sph.ph,
+    r: zoomedIn ? zoomLevelClose : zoomLevelFar,
+    tx: tgt.x,
+    ty: tgt.y,
+    tz: tgt.z
+  };
+
+  animating = true;
+});
+  
 function applyLanguage(greek){
   isGreek=greek;
   /* title box */
