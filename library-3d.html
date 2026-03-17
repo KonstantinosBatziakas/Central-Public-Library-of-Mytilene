@@ -620,7 +620,7 @@ window.addEventListener('message',e=>{
 })();
 
 function lerp(a,b,t){return a+(b-a)*t}
-
+document.getElementById('loading').style.display = 'none';
 function animate(){
   requestAnimationFrame(animate);
   if(animating&&aTgt){
