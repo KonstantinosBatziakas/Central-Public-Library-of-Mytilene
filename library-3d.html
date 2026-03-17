@@ -549,8 +549,11 @@ function goView(name,e){
   document.getElementById('idesc').textContent=isGreek?VIEWS[name].desc_gr:VIEWS[name].desc_en;
 }
 
-  document.getElementById('zoomBtn').addEventListener('click', () => {
+ document.getElementById('zoomBtn').addEventListener('click', () => {
   zoomedIn = !zoomedIn;
+
+  // change icon dynamically
+  document.getElementById('zoomBtn').textContent = zoomedIn ? '🔎' : '🔍';
 
   aTgt = {
     th: sph.th,
