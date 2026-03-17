@@ -26,6 +26,13 @@ canvas{display:block}
 .hint{position:absolute;bottom:26px;right:34px;text-align:right}
 .hint p{font-size:0.54rem;color:rgba(245,240,232,0.25);letter-spacing:0.07em;line-height:2}
 .hint span{color:rgba(184,149,42,0.55)}
+/* ZOOM CONTROLS */
+.zoom-controls{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:all}
+.zb{background:rgba(13,11,9,0.92);border:1px solid rgba(184,149,42,0.3);color:var(--gold);width:42px;height:42px;font-size:1.4rem;line-height:1;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-weight:300;font-family:'Cormorant Garamond',serif;user-select:none}
+.zb:hover{background:rgba(184,149,42,0.15);border-color:var(--gold)}
+.zb:active{background:rgba(184,149,42,0.3);transform:scale(0.93)}
+.zoom-label{font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(184,149,42,0.45);text-align:center;margin-top:4px;font-family:'Montserrat',sans-serif}
+.zoom-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
 .loading{position:absolute;inset:0;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:100}
 .loading p{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold)}
 .bar{width:200px;height:1px;background:rgba(184,149,42,0.15);position:relative;overflow:hidden}
@@ -56,6 +63,17 @@ canvas{display:block}
     <div class="info">
       <div class="ititle" id="ititle">Street View</div>
       <div class="idesc" id="idesc">The Public Central Library of Mytilene on Smyrnis Street. A two-storey neoclassical building with white plastered walls, terracotta hip roof, and distinctive burgundy red windows with arched frames. Founded 1913.</div>
+    </div>
+    <!-- ZOOM BUTTONS -->
+    <div class="zoom-controls">
+      <div class="zoom-wrap">
+        <button class="zb" id="zoomIn" title="Zoom In">+</button>
+        <div class="zoom-label" id="zoom-in-lbl">Zoom In</div>
+      </div>
+      <div class="zoom-wrap">
+        <button class="zb" id="zoomOut" title="Zoom Out">−</button>
+        <div class="zoom-label" id="zoom-out-lbl">Zoom Out</div>
+      </div>
     </div>
     <div class="hint">
       <p><span>Drag</span> — <span id="hint-rotate">rotate</span></p>
@@ -421,6 +439,7 @@ B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),0,0.02,-18.5);
 B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),3.5,0.02,-18.5);
 B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),-3.5,0.02,-18.5);
 
+/* ── Camera state ── */
 let drag=false,rDrag=false,px=0,py=0;
 let sph={th:0.55,ph:1.05,r:38};
 let tgt=new THREE.Vector3(0,4,0);
@@ -434,6 +453,7 @@ function updateCam(){
 }
 updateCam();
 
+/* ── Mouse drag ── */
 renderer.domElement.addEventListener('mousedown',e=>{drag=true;rDrag=e.button===2;px=e.clientX;py=e.clientY;});
 renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('mousemove',e=>{
@@ -448,11 +468,15 @@ document.addEventListener('mousemove',e=>{
   px=e.clientX;py=e.clientY;updateCam();
 });
 document.addEventListener('mouseup',()=>drag=false);
+
+/* ── Scroll wheel zoom (kept) ── */
 renderer.domElement.addEventListener('wheel',e=>{
   sph.r=Math.max(4,Math.min(90,sph.r+e.deltaY*0.04));
   if(animating)animating=false;
   updateCam();
 },{passive:true});
+
+/* ── Touch ── */
 let lt=null;
 renderer.domElement.addEventListener('touchstart',e=>{lt={x:e.touches[0].clientX,y:e.touches[0].clientY};});
 renderer.domElement.addEventListener('touchmove',e=>{
@@ -462,40 +486,68 @@ renderer.domElement.addEventListener('touchmove',e=>{
   lt={x:e.touches[0].clientX,y:e.touches[0].clientY};updateCam();
 });
 
+/* ── Zoom button logic ── */
+const ZOOM_STEP=3.5;  // units per click
+const ZOOM_MIN=4;
+const ZOOM_MAX=90;
+let zoomInterval=null;
+
+function doZoom(direction){
+  sph.r=Math.max(ZOOM_MIN,Math.min(ZOOM_MAX,sph.r+direction*ZOOM_STEP));
+  if(animating)animating=false;
+  updateCam();
+}
+
+function startZoom(direction){
+  doZoom(direction);
+  zoomInterval=setInterval(()=>doZoom(direction),120);
+}
+function stopZoom(){
+  clearInterval(zoomInterval);
+  zoomInterval=null;
+}
+
+const zIn=document.getElementById('zoomIn');
+const zOut=document.getElementById('zoomOut');
+
+// Mouse
+zIn.addEventListener('mousedown',()=>startZoom(-1));
+zOut.addEventListener('mousedown',()=>startZoom(1));
+document.addEventListener('mouseup',stopZoom);
+
+// Touch
+zIn.addEventListener('touchstart',e=>{e.preventDefault();startZoom(-1);},{passive:false});
+zOut.addEventListener('touchstart',e=>{e.preventDefault();startZoom(1);},{passive:false});
+document.addEventListener('touchend',stopZoom);
+
+/* ── Views ── */
 const VIEWS={
   street:{th:0.55,ph:1.05,r:38,tx:0,ty:4,tz:0,
-    title_en:'Street View',
-    title_gr:'Θέα από τον Δρόμο',
-    desc_en:'The library as seen from Smyrnis Street. White plastered two-storey building with terracotta hip roof, burgundy arched windows, iron gate and lush orange trees in the garden.',
+    title_en:'Street View',title_gr:'Θέα από τον Δρόμο',
+    desc_en:'The Public Central Library of Mytilene on Smyrnis Street. A two-storey neoclassical building with white plastered walls, terracotta hip roof, and distinctive burgundy red windows with arched frames. Founded 1913.',
     desc_gr:'Η βιβλιοθήκη όπως φαίνεται από την οδό Σμύρνης. Διώροφο νεοκλασικό κτήριο με τερακότα στέγη, τοξωτά παράθυρα με κόκκινα παντζούρια και πορτοκαλιές στον κήπο.'},
   front:{th:0.0,ph:1.08,r:22,tx:0,ty:5,tz:2,
-    title_en:'Front Facade',
-    title_gr:'Πρόσοψη',
+    title_en:'Front Facade',title_gr:'Πρόσοψη',
     desc_en:'The neoclassical facade features the semicircular pediment, the ornate red door with blue glass transom, and symmetrical arched windows with red shutters.',
     desc_gr:'Η νεοκλασική πρόσοψη με το ημικυκλικό αέτωμα, την κόκκινη πόρτα με γαλάζιο υπέρθυρο, και τα συμμετρικά τοξωτά παράθυρα με κόκκινα παντζούρια.'},
   inside1:{th:0.05,ph:1.38,r:14,tx:0,ty:2.5,tz:-1,
-    title_en:'Ground Floor',
-    title_gr:'Ισόγειο',
+    title_en:'Ground Floor',title_gr:'Ισόγειο',
     desc_en:'The ground floor reading hall with wooden bookshelves lining the walls, study tables, and the internal staircase leading to the first floor.',
     desc_gr:'Η αίθουσα ανάγνωσης του ισογείου με ξύλινες βιβλιοθήκες, τραπέζια μελέτης και την εσωτερική σκάλα που οδηγεί στον πρώτο όροφο.'},
   inside2:{th:0.05,ph:1.35,r:14,tx:0,ty:6.8,tz:-1,
-    title_en:'First Floor',
-    title_gr:'Πρώτος Όροφος',
+    title_en:'First Floor',title_gr:'Πρώτος Όροφος',
     desc_en:'The first floor contains the rare collections including the Vernardakis archive, the Lefkias historical archive, and academic journals.',
     desc_gr:'Ο πρώτος όροφος φιλοξενεί τις σπάνιες συλλογές, το αρχείο Βερναρδάκη, το ιστορικό αρχείο Λεφκία και τα ακαδημαϊκά περιοδικά.'},
   aerial:{th:0.5,ph:0.15,r:58,tx:0,ty:0,tz:0,
-    title_en:'Aerial View',
-    title_gr:'Αεροφωτογραφία',
+    title_en:'Aerial View',title_gr:'Αεροφωτογραφία',
     desc_en:'Looking down at the hip roof with its characteristic ridges and two skylights. The pebble courtyard, iron fence, garden with orange trees are all visible.',
     desc_gr:'Από ψηλά διακρίνεται η τετράρρικτη στέγη με τις χαρακτηριστικές ακμές και τα δύο φεγγίτες. Ορατές η αυλή, ο σιδερένιος φράκτης και οι πορτοκαλιές.'},
   garden:{th:-1.3,ph:1.1,r:26,tx:-10,ty:4,tz:0,
-    title_en:'Garden Side',
-    title_gr:'Κήπος',
+    title_en:'Garden Side',title_gr:'Κήπος',
     desc_en:'The left side of the building with the garden, orange trees, and the side entrance. This area was part of the original Doukarou clinic grounds.',
     desc_gr:'Η αριστερή πλευρά του κτηρίου με τον κήπο, τις πορτοκαλιές και την πλαϊνή είσοδο. Αυτός ο χώρος ήταν τμήμα της αρχικής Κλινικής Δούκαρου.'},
 };
 
-/* ── button label translations ── */
 const BTN_LABELS={
   street: {en:'Street View',     gr:'Θέα από τον Δρόμο'},
   front:  {en:'Front Facade',    gr:'Πρόσοψη'},
@@ -523,43 +575,30 @@ function goView(name,e){
 
 function applyLanguage(greek){
   isGreek=greek;
-  /* title box */
   document.getElementById('ui-lbl').textContent=greek?'Διαδραστικό 3D Μοντέλο':'3D Interactive Model';
   document.getElementById('ui-ttl').innerHTML=greek?'Δημόσια Κεντρική <em>Βιβλιοθήκη</em>':'Public Central <em>Library</em>';
-  /* view buttons */
   Object.keys(BTN_LABELS).forEach(key=>{
     const btn=document.getElementById('vb-'+key);
-    if(btn){
-      const span=btn.querySelector('.vb-txt');
-      if(span)span.textContent=greek?BTN_LABELS[key].gr:BTN_LABELS[key].en;
-    }
+    if(btn){const span=btn.querySelector('.vb-txt');if(span)span.textContent=greek?BTN_LABELS[key].gr:BTN_LABELS[key].en;}
   });
-  /* active view info panel */
   const v=VIEWS[currentView];
   document.getElementById('ititle').textContent=greek?v.title_gr:v.title_en;
   document.getElementById('idesc').textContent=greek?v.desc_gr:v.desc_en;
-  /* hint controls */
   document.getElementById('hint-rotate').textContent=greek?'περιστροφή':'rotate';
   document.getElementById('hint-zoom').textContent=greek?'ζουμ':'zoom';
   document.getElementById('hint-pan').textContent=greek?'μετακίνηση':'pan';
+  // zoom button labels
+  document.getElementById('zoom-in-lbl').textContent=greek?'Μεγέθυνση':'Zoom In';
+  document.getElementById('zoom-out-lbl').textContent=greek?'Σμίκρυνση':'Zoom Out';
 }
 
-/* listen for language change message from parent page */
 window.addEventListener('message',e=>{
-  if(e.data&&e.data.type==='setLanguage'){
-    applyLanguage(e.data.greek);
-  }
+  if(e.data&&e.data.type==='setLanguage'){applyLanguage(e.data.greek);}
 });
-
-/* Tell parent we are ready, and also check URL ?lang=gr param as fallback */
 (function(){
   const params=new URLSearchParams(window.location.search);
-  if(params.get('lang')==='gr') applyLanguage(true);
-  try{
-    if(window.parent&&window.parent!==window){
-      window.parent.postMessage({type:'iframeReady'},'*');
-    }
-  }catch(err){}
+  if(params.get('lang')==='gr')applyLanguage(true);
+  try{if(window.parent&&window.parent!==window){window.parent.postMessage({type:'iframeReady'},'*');}}catch(err){}
 })();
 
 function lerp(a,b,t){return a+(b-a)*t}
