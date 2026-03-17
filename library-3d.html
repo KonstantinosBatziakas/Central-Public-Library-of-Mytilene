@@ -450,6 +450,9 @@ let drag=false,rDrag=false,px=0,py=0;
 let sph={th:0.55,ph:1.05,r:38};
 let tgt=new THREE.Vector3(0,4,0);
 let aTgt=null,animating=false;
+let zoomedIn = false;
+let zoomLevelClose = 10;   // how close zoom goes
+let zoomLevelFar = 38;    // default (same as street view)
 
 function updateCam(){
   cam.position.x=tgt.x+sph.r*Math.sin(sph.ph)*Math.sin(sph.th);
