@@ -227,41 +227,41 @@ archMesh.position.set(0,8.7,7.3);
 archMesh.castShadow=true;
 scene.add(archMesh);
 
-(function(){
-  function makeCharSprite(ch,fontSize,color){
-    const cvs=document.createElement('canvas');
-    cvs.width=128;cvs.height=128;
-    const ctx=cvs.getContext('2d');
-    ctx.clearRect(0,0,128,128);
-    ctx.font=`bold ${fontSize}px Georgia, serif`;
-    ctx.fillStyle=color;
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(ch,64,64);
-    const tex=new THREE.CanvasTexture(cvs);
-    tex.needsUpdate=true;
-    const mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
-    return new THREE.Sprite(mat);
-  }
-  function placeTextOnArc(text,arcCX,arcCY,arcZ,arcR,midAngle,totalSpan,spriteScale,fontSize){
-    const chars=text.split('');
-    const n=chars.length;
-    chars.forEach((ch,i)=>{
-      const t=n===1?0:(i/(n-1)-0.5);
-      const ang=midAngle+t*totalSpan;
-      const x=arcCX+arcR*Math.cos(ang);
-      const y=arcCY+arcR*Math.sin(ang);
-      const sp=makeCharSprite(ch,fontSize,'#2d1a06');
-      sp.scale.set(spriteScale,spriteScale,1);
-      sp.position.set(x,y,arcZ);
-      scene.add(sp);
-    });
-  }
-  const AX=0,AY=8.7,AZ=7.85,AR=4.5,TOP=Math.PI/2;
-  placeTextOnArc('ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ',AX,AY,AZ,4.0,TOP,2.2,0.55,80);
-  placeTextOnArc('ΒΙΒΛΙΟΘΗΚΗ',AX,AY,AZ,3.2,TOP,1.8,0.52,80);
-  placeTextOnArc('ΜΥΤΙΛΗΝΗΣ',AX,AY,AZ,2.3,TOP,1.5,0.50,80);
-})();
+//(function(){
+ // function makeCharSprite(ch,fontSize,color){
+   // const cvs=document.createElement('canvas');
+   // cvs.width=128;cvs.height=128;
+   // const ctx=cvs.getContext('2d');
+   // ctx.clearRect(0,0,128,128);
+   // ctx.font=`bold ${fontSize}px Georgia, serif`;
+   // ctx.fillStyle=color;
+   // ctx.textAlign='center';
+   // ctx.textBaseline='middle';
+  //  ctx.fillText(ch,64,64);
+   // const tex=new THREE.CanvasTexture(cvs);
+  //  tex.needsUpdate=true;
+   // const mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+  //  return new THREE.Sprite(mat);
+ // }
+//  function placeTextOnArc(text,arcCX,arcCY,arcZ,arcR,midAngle,totalSpan,spriteScale,fontSize){
+   // const chars=text.split('');
+    //const n=chars.length;
+   // chars.forEach((ch,i)=>{
+     // const t=n===1?0:(i/(n-1)-0.5);
+      //const ang=midAngle+t*totalSpan;
+     // const x=arcCX+arcR*Math.cos(ang);
+      //const y=arcCY+arcR*Math.sin(ang);
+    //  const sp=makeCharSprite(ch,fontSize,'#2d1a06');
+     // sp.scale.set(spriteScale,spriteScale,1);
+     // sp.position.set(x,y,arcZ);
+     // scene.add(sp);
+   // });
+ // }
+  //const AX=0,AY=8.7,AZ=7.85,AR=4.5,TOP=Math.PI/2;
+  // placeTextOnArc('ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ',AX,AY,AZ,4.0,TOP,2.2,0.55,80);
+  //placeTextOnArc('ΒΙΒΛΙΟΘΗΚΗ',AX,AY,AZ,3.2,TOP,1.8,0.52,80);
+  //placeTextOnArc('ΜΥΤΙΛΗΝΗΣ',AX,AY,AZ,2.3,TOP,1.5,0.50,80);
+//})();
 
 function archWindow(x,y,z,w,h,rot){
   const g=new THREE.Group();
