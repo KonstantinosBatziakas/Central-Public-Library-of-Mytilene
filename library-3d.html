@@ -228,81 +228,39 @@ archMesh.castShadow=true;
 scene.add(archMesh);
 
 (function(){
-  /* The arch in 3D:
-       world centre: (0, 8.7, 7.3), extruded 0.4 → front face z=7.7
-       outer radius 4.5, inner radius 3.8, spans 0→π (right→top→left)
-     Strategy: render all text onto ONE canvas using the 2D arc-text technique,
-     then map it onto a PlaneGeometry that exactly covers the arch front face.
-     The plane is 9 units wide × 4.5 units tall (= diameter × radius),
-     centred at the arch centre. Canvas origin maps 1:1 to that plane.
-     In canvas coords: arc centre = (CW/2, CH) i.e. bottom-centre,
-     and the semicircle opens UPWARD (negative-Y in canvas = upward).            */
-
-  const CW=1024, CH=512;
-  const cvs=document.createElement('canvas');
-  cvs.width=CW; cvs.height=CH;
-  const ctx=cvs.getContext('2d');
-  ctx.clearRect(0,0,CW,CH);
-
-  // Arc centre in canvas pixels — sits at the very bottom centre
-  const cx=CW/2, cy=CH;
-
-  // Scale: plane is 9 world-units wide → CW pixels, so 1 world unit = CW/9 px
-  const SCALE=CW/9.0;
-
-  // Ring radii in canvas pixels (matching world radii: outer=4.5, inner=3.8)
-  // We place three rings inside the band:
-  //   outer text ring at r=4.15 world → 4.15*SCALE px
-  //   mid   text ring at r=3.55 world → 3.55*SCALE px
-  //   inner text ring at r=2.95 world → 2.95*SCALE px
-
-  function drawArcText(text, rPx, fontSize, letterSpacing){
-    ctx.save();
-    ctx.font=`bold ${fontSize}px Georgia,serif`;
-    ctx.fillStyle='#1a0e04';
+  function makeCharSprite(ch,fontSize,color){
+    const cvs=document.createElement('canvas');
+    cvs.width=128;cvs.height=128;
+    const ctx=cvs.getContext('2d');
+    ctx.clearRect(0,0,128,128);
+    ctx.font=`bold ${fontSize}px Georgia, serif`;
+    ctx.fillStyle=color;
     ctx.textAlign='center';
-    ctx.textBaseline='alphabetic';
-
-    const chars=[...text.trim()];
-    // Measure each char
-    const widths=chars.map(c=>ctx.measureText(c).width+letterSpacing);
-    const totalArcLen=widths.reduce((a,b)=>a+b,0);
-    // Total angle span
-    const totalAng=totalArcLen/rPx;
-    // Start from top of arc (angle = -π/2 in standard canvas = pointing up)
-    // Canvas angles: 0=right, π/2=down, -π/2=up
-    let ang=-Math.PI/2 - totalAng/2;
-
-    chars.forEach((ch,i)=>{
-      const charAng=widths[i]/rPx;
-      ang+=charAng/2; // advance to char centre
-      ctx.save();
-      ctx.translate(cx+rPx*Math.cos(ang), cy+rPx*Math.sin(ang));
-      // Rotate: tangent to circle, letters read outward (top away from centre)
-      ctx.rotate(ang+Math.PI/2);
-      ctx.fillText(ch,0,0);
-      ctx.restore();
-      ang+=charAng/2;
-    });
-    ctx.restore();
+    ctx.textBaseline='middle';
+    ctx.fillText(ch,64,64);
+    const tex=new THREE.CanvasTexture(cvs);
+    tex.needsUpdate=true;
+    const mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+    return new THREE.Sprite(mat);
   }
-
-  drawArcText('ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ', 4.15*SCALE, 46, 2);
-  drawArcText('ΒΙΒΛΙΟΘΗΚΗ',       3.50*SCALE, 44, 3);
-  drawArcText('ΜΥΤΙΛΗΝΗΣ',        2.88*SCALE, 42, 4);
-
-  const tex=new THREE.CanvasTexture(cvs);
-  tex.needsUpdate=true;
-
-  // Plane: 9 units wide, 4.5 units tall, centred at arch centre on front face
-  // Plane centre Y = AY + CH_worldUnits/2 - 0  → arch centre is at bottom of plane
-  const planeW=9.0, planeH=4.5;
-  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.FrontSide});
-  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(planeW,planeH),mat);
-  // Arch world centre: x=0, y=8.7. Canvas cy=CH maps to y=8.7, canvas top maps to y=8.7+4.5=13.2
-  // So plane centre Y = 8.7 + planeH/2
-  mesh.position.set(0, 8.7+planeH/2, 7.75);
-  scene.add(mesh);
+  function placeTextOnArc(text,arcCX,arcCY,arcZ,arcR,midAngle,totalSpan,spriteScale,fontSize){
+    const chars=text.split('');
+    const n=chars.length;
+    chars.forEach((ch,i)=>{
+      const t=n===1?0:(i/(n-1)-0.5);
+      const ang=midAngle+t*totalSpan;
+      const x=arcCX+arcR*Math.cos(ang);
+      const y=arcCY+arcR*Math.sin(ang);
+      const sp=makeCharSprite(ch,fontSize,'#2d1a06');
+      sp.scale.set(spriteScale,spriteScale,1);
+      sp.position.set(x,y,arcZ);
+      scene.add(sp);
+    });
+  }
+  const AX=0,AY=8.7,AZ=7.85,AR=4.5,TOP=Math.PI/2;
+  placeTextOnArc('ΔΗΜΟΣΙΑ ΚΕΝΤΡΙΚΗ',AX,AY,AZ,4.0,TOP,2.2,0.55,80);
+  placeTextOnArc('ΒΙΒΛΙΟΘΗΚΗ',AX,AY,AZ,3.2,TOP,1.8,0.52,80);
+  placeTextOnArc('ΜΥΤΙΛΗΝΗΣ',AX,AY,AZ,2.3,TOP,1.5,0.50,80);
 })();
 
 function archWindow(x,y,z,w,h,rot){
