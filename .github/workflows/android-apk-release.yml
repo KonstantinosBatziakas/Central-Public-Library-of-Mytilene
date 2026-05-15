@@ -28,6 +28,122 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Install CairoSVG for icon generation
+        run: pip install cairosvg --break-system-packages -q
+
+      - name: Generate app icons from logo SVG
+        run: |
+          cat << 'EOF' > /tmp/cplm_logo.svg
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+            <defs>
+              <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#1a2744;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#0d1a38;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f0c96a" />
+                <stop offset="50%" style="stop-color:#e0a830" />
+                <stop offset="100%" style="stop-color:#c8891a" />
+              </linearGradient>
+              <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#f5d98a" />
+                <stop offset="100%" style="stop-color:#c8891a" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <circle cx="200" cy="200" r="195" fill="url(#bgGrad)" />
+            <circle cx="200" cy="200" r="188" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.6"/>
+            <circle cx="200" cy="200" r="180" fill="none" stroke="url(#goldGrad)" stroke-width="0.5" opacity="0.3"/>
+            <g opacity="0.85">
+              <path d="M90 260 Q100 240 115 230" stroke="url(#goldGrad)" stroke-width="1.5" fill="none"/>
+              <ellipse cx="112" cy="228" rx="8" ry="4" fill="url(#goldGrad)" transform="rotate(-40 112 228)"/>
+              <path d="M90 260 Q95 235 105 220" stroke="url(#goldGrad)" stroke-width="1.5" fill="none"/>
+              <ellipse cx="103" cy="218" rx="8" ry="4" fill="url(#goldGrad)" transform="rotate(-55 103 218)"/>
+              <path d="M90 260 Q85 238 88 222" stroke="url(#goldGrad)" stroke-width="1.5" fill="none"/>
+              <ellipse cx="86" cy="220" rx="8" ry="4" fill="url(#goldGrad)" transform="rotate(-70 86 220)"/>
+            </g>
+            <g opacity="0.85" transform="scale(-1,1) translate(-400,0)">
+              <path d="M90 260 Q100 240 115 230" stroke="url(#goldGrad)" stroke-width="1.5" fill="none"/>
+              <ellipse cx="112" cy="228" rx="8" ry="4" fill="url(#goldGrad)" transform="rotate(-40 112 228)"/>
+              <path d="M90 260 Q95 235 105 220" stroke="url(#goldGrad)" stroke-width="1.5" fill="none"/>
+              <ellipse cx="103" cy="218" rx="8" ry="4" fill="url(#goldGrad)" transform="rotate(-55 103 218)"/>
+              <path d="M90 260 Q85 238 88 222" stroke="url(#goldGrad)" stroke-width="1.5" fill="none"/>
+              <ellipse cx="86" cy="220" rx="8" ry="4" fill="url(#goldGrad)" transform="rotate(-70 86 220)"/>
+            </g>
+            <rect x="128" y="170" width="14" height="80" fill="url(#goldGrad2)" rx="1"/>
+            <rect x="125" y="165" width="20" height="8" fill="url(#goldGrad)" rx="1"/>
+            <rect x="123" y="248" width="24" height="5" fill="url(#goldGrad)" rx="1"/>
+            <rect x="155" y="170" width="14" height="80" fill="url(#goldGrad2)" rx="1"/>
+            <rect x="152" y="165" width="20" height="8" fill="url(#goldGrad)" rx="1"/>
+            <rect x="150" y="248" width="24" height="5" fill="url(#goldGrad)" rx="1"/>
+            <rect x="231" y="170" width="14" height="80" fill="url(#goldGrad2)" rx="1"/>
+            <rect x="228" y="165" width="20" height="8" fill="url(#goldGrad)" rx="1"/>
+            <rect x="226" y="248" width="24" height="5" fill="url(#goldGrad)" rx="1"/>
+            <rect x="258" y="170" width="14" height="80" fill="url(#goldGrad2)" rx="1"/>
+            <rect x="255" y="165" width="20" height="8" fill="url(#goldGrad)" rx="1"/>
+            <rect x="253" y="248" width="24" height="5" fill="url(#goldGrad)" rx="1"/>
+            <polygon points="200,115 290,162 110,162" fill="url(#bgGrad)" stroke="url(#goldGrad)" stroke-width="2"/>
+            <polygon points="200,122 283,160 117,160" fill="#1e2e55" opacity="0.8"/>
+            <g filter="url(#glow)" transform="translate(200,143)">
+              <path d="M0,-12 Q-18,-10 -20,2 Q-18,12 0,10 Q18,12 20,2 Q18,-10 0,-12Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.2"/>
+              <line x1="0" y1="-12" x2="0" y2="10" stroke="url(#goldGrad)" stroke-width="1"/>
+              <line x1="-14" y1="-3" x2="-5" y2="-3" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.7"/>
+              <line x1="-14" y1="1" x2="-5" y2="1" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.7"/>
+              <line x1="5" y1="-3" x2="14" y2="-3" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.7"/>
+              <line x1="5" y1="1" x2="14" y2="1" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.7"/>
+            </g>
+            <rect x="110" y="158" width="180" height="10" fill="url(#goldGrad)" rx="1"/>
+            <rect x="108" y="253" width="184" height="7" fill="url(#goldGrad)" rx="1"/>
+            <rect x="112" y="260" width="176" height="5" fill="url(#goldGrad2)" rx="1" opacity="0.6"/>
+            <rect x="176" y="195" width="9" height="50" fill="#c8891a" rx="1" opacity="0.9"/>
+            <rect x="186" y="200" width="9" height="45" fill="#1a4a7a" rx="1" opacity="0.9"/>
+            <rect x="196" y="192" width="9" height="53" fill="#8b1a1a" rx="1" opacity="0.9"/>
+            <rect x="206" y="198" width="9" height="47" fill="#1a5c2a" rx="1" opacity="0.9"/>
+            <rect x="216" y="194" width="9" height="51" fill="#4a1a6a" rx="1" opacity="0.9"/>
+            <rect x="176" y="195" width="2" height="50" fill="#f5d98a" rx="1" opacity="0.3"/>
+            <rect x="186" y="200" width="2" height="45" fill="#f5d98a" rx="1" opacity="0.3"/>
+            <rect x="196" y="192" width="2" height="53" fill="#f5d98a" rx="1" opacity="0.3"/>
+            <rect x="206" y="198" width="2" height="47" fill="#f5d98a" rx="1" opacity="0.3"/>
+            <rect x="216" y="194" width="2" height="51" fill="#f5d98a" rx="1" opacity="0.3"/>
+            <circle cx="155" cy="140" r="1.5" fill="url(#goldGrad)" opacity="0.7"/>
+            <circle cx="245" cy="140" r="1.5" fill="url(#goldGrad)" opacity="0.7"/>
+            <text x="200" y="298" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="bold" letter-spacing="3" fill="url(#goldGrad)">ΚΕΝΤΡΙΚΗ ΔΗΜΟΣΙΑ</text>
+            <text x="200" y="316" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="bold" letter-spacing="4" fill="url(#goldGrad)">ΒΙΒΛΙΟΘΗΚΗ</text>
+            <line x1="130" y1="323" x2="270" y2="323" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.6"/>
+            <text x="200" y="339" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="12" letter-spacing="5" fill="url(#goldGrad)" opacity="0.85">ΜΥΤΙΛΗΝΗΣ</text>
+            <text x="200" y="358" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="10" letter-spacing="2" fill="url(#goldGrad)" opacity="0.6">EST. 1953</text>
+            <circle cx="168" cy="358" r="1.5" fill="url(#goldGrad)" opacity="0.5"/>
+            <circle cx="232" cy="358" r="1.5" fill="url(#goldGrad)" opacity="0.5"/>
+          </svg>
+          EOF
+
+          python3 - << 'PYEOF'
+          import cairosvg
+          import os
+
+          sizes = {
+            "mipmap-mdpi":    48,
+            "mipmap-hdpi":    72,
+            "mipmap-xhdpi":   96,
+            "mipmap-xxhdpi":  144,
+            "mipmap-xxxhdpi": 192,
+          }
+
+          base = "android-app/app/src/main/res"
+          for folder, size in sizes.items():
+            path = f"{base}/{folder}"
+            os.makedirs(path, exist_ok=True)
+            cairosvg.svg2png(url="/tmp/cplm_logo.svg", write_to=f"{path}/ic_launcher.png", output_width=size, output_height=size)
+            cairosvg.svg2png(url="/tmp/cplm_logo.svg", write_to=f"{path}/ic_launcher_round.png", output_width=size, output_height=size)
+            print(f"Generated {folder} ({size}x{size})")
+          PYEOF
+
       - name: Build debug APK
         working-directory: android-app
         run: gradle :app:assembleDebug
