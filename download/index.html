@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0e0c0a" />
+  <title>Mobile Download | Public Central Library of Mytilene</title>
+  <style>
+    body{margin:0;font-family:Arial,sans-serif;background:#0e0c0a;color:#f5f0e8;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .card{max-width:720px;width:100%;border:1px solid rgba(184,149,42,.35);padding:24px;background:rgba(255,255,255,.03)}
+    h1{font-size:1.4rem;margin:0 0 10px;color:#d4af5a}
+    p{opacity:.85;line-height:1.6}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+    a{display:inline-block;padding:10px 14px;border:1px solid rgba(184,149,42,.55);color:#f5f0e8;text-decoration:none;font-size:.9rem}
+    a:hover{background:rgba(184,149,42,.1)}
+    .small{font-size:.8rem;opacity:.65;margin-top:14px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Mobile Access</h1>
+    <p>Use this page for iPhone PWA installation and Android APK download.</p>
+    <div class="actions">
+      <a href="https://konstantinosbatziakas.github.io/Central-Public-Library-of-Mytilene/">Open iPhone PWA Page</a>
+      <a href="https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest/download/central-library-android.apk">Download Android APK</a>
+      <a href="https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest">Open Latest Release</a>
+    </div>
+    <p class="small">Tip: iPhone users should open in Safari and choose “Add to Home Screen”.</p>
+  </main>
+  <script>
+    (function () {
+      const ua = navigator.userAgent || '';
+      const isAndroid = /Android/i.test(ua);
+      if (isAndroid) {
+        window.location.replace('https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest/download/central-library-android.apk');
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -13,7 +13,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="ΔΚΒΜ"/>
+<meta name="description" content="Public Central Library of Mytilene mobile web app and Android APK access."/>
 <link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png"/>
+<link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png"/>
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png"/>
 <title>Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -174,6 +178,9 @@ section{padding:clamp(64px,8vw,120px) clamp(24px,5vw,60px)}
 .app-steps li{font-size:0.74rem;color:rgba(245,240,232,0.62);line-height:1.8}
 .app-link{display:inline-flex;align-items:center;gap:10px;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#f5f0e8 !important;border:1px solid rgba(184,149,42,0.5);padding:12px 16px;margin-top:18px;transition:all 0.3s}
 .app-link:hover{background:rgba(184,149,42,0.12);border-color:#b8952a;color:#d4af5a !important}
+.qr-wrap{margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.qr-wrap img{width:120px;height:120px;display:block;background:#fff;padding:6px;border:1px solid rgba(184,149,42,0.3)}
+.qr-note{font-size:0.68rem;color:rgba(245,240,232,0.48);line-height:1.7}
 
 /* ── 3D MODEL (dark) ──────────────────────────── */
 #model-section{background:#0e0c0a;padding:0}
@@ -504,18 +511,38 @@ footer{background:#080706;padding:44px 60px;display:flex;justify-content:space-b
     <div class="section-divider"></div>
     <div class="mobile-app-grid">
       <article class="app-card">
-        <h3 data-en="iPhone (Free Web App)" data-gr="iPhone (Δωρεάν Web App)">iPhone (Free Web App)</h3>
-        <p data-en="Open this website in Safari and install it to your Home Screen for app-like access without App Store costs." data-gr="Ανοίξτε αυτόν τον ιστότοπο στο Safari και προσθέστε τον στην Αρχική Οθόνη για εμπειρία εφαρμογής χωρίς κόστος App Store.">Open this website in Safari and install it to your Home Screen for app-like access without App Store costs.</p>
+        <h3 data-en="iPhone (PWA)" data-gr="iPhone (PWA)">iPhone (PWA)</h3>
+        <p data-en="Install directly from Safari for app-like home-screen access." data-gr="Εγκαταστήστε απευθείας από Safari για εμπειρία εφαρμογής στην αρχική οθόνη.">Install directly from Safari for app-like home-screen access.</p>
         <ol class="app-steps">
-          <li data-en="Open in Safari" data-gr="Ανοίξτε το στο Safari">Open in Safari</li>
+          <li data-en="Open the website in Safari" data-gr="Ανοίξτε τον ιστότοπο στο Safari">Open the website in Safari</li>
           <li data-en="Tap Share" data-gr="Πατήστε Κοινοποίηση">Tap Share</li>
-          <li data-en="Choose Add to Home Screen" data-gr="Επιλέξτε Προσθήκη στην Αρχική Οθόνη">Choose Add to Home Screen</li>
+          <li data-en="Tap Add to Home Screen" data-gr="Πατήστε Προσθήκη στην Αρχική Οθόνη">Tap Add to Home Screen</li>
         </ol>
+        <a class="app-link" href="https://konstantinosbatziakas.github.io/Central-Public-Library-of-Mytilene/" target="_blank" rel="noopener noreferrer" data-en="Open PWA" data-gr="Άνοιγμα PWA">Open PWA</a>
+        <div class="qr-wrap">
+          <img src="assets/qr/iphone-pwa-qr.png" alt="QR code for iPhone PWA"/>
+          <p class="qr-note" data-en="Scan to open the PWA page on iPhone." data-gr="Σαρώστε για να ανοίξετε τη σελίδα PWA σε iPhone.">Scan to open the PWA page on iPhone.</p>
+        </div>
       </article>
+
       <article class="app-card">
         <h3 data-en="Android (APK)" data-gr="Android (APK)">Android (APK)</h3>
-        <p data-en="Download and install the Android APK from the repository releases page." data-gr="Κατεβάστε και εγκαταστήστε το Android APK από τη σελίδα releases του αποθετηρίου.">Download and install the Android APK from the repository releases page.</p>
-        <a class="app-link" href="https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases" target="_blank" rel="noopener noreferrer" data-en="Open APK Releases" data-gr="Άνοιγμα APK Releases">Open APK Releases</a>
+        <p data-en="Download the latest signed APK directly from Releases." data-gr="Κατεβάστε το τελευταίο υπογεγραμμένο APK απευθείας από τα Releases.">Download the latest signed APK directly from Releases.</p>
+        <a class="app-link" href="https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest/download/central-library-android.apk" target="_blank" rel="noopener noreferrer" data-en="Download Latest APK" data-gr="Λήψη Τελευταίου APK">Download Latest APK</a>
+        <div class="qr-wrap">
+          <img src="assets/qr/android-apk-qr.png" alt="QR code for Android APK download"/>
+          <p class="qr-note" data-en="Scan to download the latest Android APK." data-gr="Σαρώστε για να κατεβάσετε το τελευταίο Android APK.">Scan to download the latest Android APK.</p>
+        </div>
+      </article>
+
+      <article class="app-card">
+        <h3 data-en="One QR for All Devices" data-gr="Ένα QR για Όλες τις Συσκευές">One QR for All Devices</h3>
+        <p data-en="Use one QR that opens the mobile download page. Android users are redirected to the APK automatically." data-gr="Χρησιμοποιήστε ένα QR που ανοίγει τη σελίδα λήψης. Οι χρήστες Android ανακατευθύνονται αυτόματα στο APK.">Use one QR that opens the mobile download page. Android users are redirected to the APK automatically.</p>
+        <a class="app-link" href="download/" data-en="Open Download Page" data-gr="Άνοιγμα Σελίδας Λήψης">Open Download Page</a>
+        <div class="qr-wrap">
+          <img src="assets/qr/mobile-download-qr.png" alt="QR code for mobile download page"/>
+          <p class="qr-note" data-en="Use this QR in posters/flyers for a stable mobile entrypoint." data-gr="Χρησιμοποιήστε αυτό το QR σε αφίσες/έντυπα για σταθερό σημείο εισόδου.">Use this QR in posters/flyers for a stable mobile entrypoint.</p>
+        </div>
       </article>
     </div>
   </div>
