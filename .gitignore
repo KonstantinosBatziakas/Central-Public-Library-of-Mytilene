@@ -1,3 +1,7 @@
 _site/
 .jekyll-cache/
 .DS_Store
+
+# Android local build/cache directories
+android-app/.gradle/
+android-app/app/build/
