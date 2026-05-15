@@ -2,7 +2,7 @@
 
 ## iOS App (SwiftUI) Source
 
-This repository now includes a native iOS app source scaffold in:
+This repository includes a native iOS app source scaffold in:
 
 `ios-app/CentralLibraryApp`
 
@@ -18,60 +18,81 @@ This repository now includes a native iOS app source scaffold in:
 - Greek/English runtime language switching with persistence (`UserDefaults`)
 - Bundled offline content model in:
   - `ios-app/CentralLibraryApp/Resources/library_content.json`
-- Embedded local 3D model experience using `WKWebView` with instant language syncing
-- Liquid-glass inspired visual style using material backgrounds and soft futuristic accents
+- Embedded local 3D model experience using `WKWebView`
+- Instant language syncing between app UI and embedded 3D experience
+- Liquid-glass inspired visual style with material backgrounds and futuristic accents
 
-### Notes
+## Mobile Access Strategy
 
-- The app source is designed for Xcode/iOS and should be added to an iOS target in Xcode.
-- The 3D model HTML is bundled locally at:
-  - `ios-app/CentralLibraryApp/Resources/library-3d.html`
+### iPhone (PWA)
 
-### Xcode setup checklist
+The website is installable on iPhone via Safari Add to Home Screen.
 
-1. Create or open an iOS App project in Xcode.
-2. Add all files from:
-   - `ios-app/CentralLibraryApp`
-3. Ensure app source files are in the app target.
-4. Ensure resources are in **Copy Bundle Resources**:
-   - `ios-app/CentralLibraryApp/Resources/library_content.json`
-   - `ios-app/CentralLibraryApp/Resources/library-3d.html`
-5. Add the test file folder to a unit test target:
-   - `ios-app/CentralLibraryAppTests`
-
-### Manual QA checklist (Xcode simulators)
-
-- Run on **iPhone** and **iPad** simulators.
-- Verify:
-  - Tab navigation across all sections.
-  - Greek/English toggle updates all tabs.
-  - Language persists after app relaunch.
-  - 3D view loads correctly.
-- Accessibility pass:
-  - Dynamic Type at larger sizes.
-  - VoiceOver reads key labels and cards.
-  - Touch targets are comfortably tappable.
-  - Contrast/readability in light and dark appearance.
-- 3D performance pass on older simulator profiles:
-  - If interaction is not smooth, track a Phase 2 spike for SceneKit/RealityKit migration.
-
-## Free Mobile Access (Web + Android APK)
-
-### iPhone users (free)
-
-- Open the hosted website in Safari.
-- Tap **Share**.
-- Tap **Add to Home Screen**.
-
-This gives app-like access without App Store publishing.
-
-### Android users (APK)
-
-- Publish Android APK files under:
-  - `https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases`
-- Users can download the latest APK directly from the Releases page.
-
-### PWA files included
+PWA files:
 
 - `manifest.webmanifest`
 - `service-worker.js`
+- `assets/icons/icon-192.png`
+- `assets/icons/icon-512.png`
+- `assets/icons/apple-touch-icon.png`
+
+Install steps:
+
+1. Open the hosted website in Safari.
+2. Tap Share.
+3. Tap Add to Home Screen.
+
+### Android (APK)
+
+A native Android WebView wrapper is available in:
+
+- `android-app/`
+
+The release workflow builds and signs an APK, then uploads it with a fixed filename:
+
+- `central-library-android.apk`
+
+Stable latest-download URL:
+
+- `https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest/download/central-library-android.apk`
+
+## QR Distribution Assets
+
+QR images are stored in:
+
+- `assets/qr/iphone-pwa-qr.png`
+- `assets/qr/android-apk-qr.png`
+- `assets/qr/mobile-download-qr.png`
+
+The unified QR points to:
+
+- `https://konstantinosbatziakas.github.io/Central-Public-Library-of-Mytilene/download/`
+
+On Android, this page auto-redirects to the latest APK download URL.
+
+## Android Release Flow
+
+Workflow file:
+
+- `.github/workflows/android-apk-release.yml`
+
+Triggers:
+
+- Release published
+- Manual workflow dispatch
+
+Required repository secrets for signing:
+
+- `ANDROID_KEYSTORE_BASE64`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_PASSWORD`
+
+## End-to-End Validation Checklist
+
+- iPhone Safari: Add to Home Screen works and launches standalone mode.
+- iPhone PWA icon appears correctly from Apple touch icon.
+- Android APK installs from latest-release fixed URL.
+- All three QR codes open the expected target URLs.
+- Unified QR download page redirects Android devices to APK URL.
+- Website still loads and service worker registers without errors.
