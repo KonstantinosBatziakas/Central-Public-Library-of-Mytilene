@@ -1,0 +1,249 @@
+{
+  "appTitle": {
+    "en": "Public Central Library of Mytilene",
+    "gr": "Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης"
+  },
+  "aboutTitle": {
+    "en": "Over a Century of Knowledge",
+    "gr": "Πάνω από Έναν Αιώνα Γνώσης"
+  },
+  "aboutParagraphs": [
+    {
+      "en": "The Public Central Library of Mytilene is the largest library on Lesbos. Its origins trace back to 1913, following the liberation of the island from Ottoman rule, when the local press first called for the creation of a public library open to all. It was formally established as a Municipal Library by decision of the Mytilene City Council, later becoming a public institution in 1952.",
+      "gr": "Η Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης είναι η μεγαλύτερη βιβλιοθήκη της Λέσβου. Οι ρίζες της ανάγονται στο 1913, μετά την απελευθέρωση του νησιού. Συστήθηκε επίσημα ως Δημοτική Βιβλιοθήκη και το 1952 έγινε δημόσια."
+    },
+    {
+      "en": "Today the Library is housed in the former Doukarou Clinic building on Smyrnis Street, a neoclassical structure at the heart of Mytilene. It holds over 55,000 volumes, a rare-books collection, the Vernardakis literary archive, the Lefkias historical archive, and the Syropoulos bequest.",
+      "gr": "Σήμερα στεγάζεται στην παλαιά Κλινική Δούκαρου στη Σμύρνης. Διαθέτει πάνω από 55.000 τόμους, σπάνια βιβλία, το αρχείο Βερναρδάκη, το αρχείο Λεφκία και τη συλλογή Συρόπουλου."
+    }
+  ],
+  "stats": [
+    {
+      "id": "7705f066-b854-46ba-bca5-1825adfb50c9",
+      "value": "55,000+",
+      "label": { "en": "Volumes in Collection", "gr": "Τόμοι Συλλογής" }
+    },
+    {
+      "id": "1ba8be46-3115-4faa-b977-fa8a0e3feb0e",
+      "value": "1913",
+      "label": { "en": "Year Founded", "gr": "Έτος Ίδρυσης" }
+    },
+    {
+      "id": "6768c97c-cf4f-4636-a8db-f8b2573a6107",
+      "value": "2",
+      "label": { "en": "Floors of Reading Rooms", "gr": "Όροφοι Αναγνωστηρίων" }
+    },
+    {
+      "id": "4df41af4-1fcb-4faf-ab35-20f2e51913fd",
+      "value": "4",
+      "label": { "en": "Archive Collections", "gr": "Αρχειακές Συλλογές" }
+    }
+  ],
+  "collections": [
+    {
+      "id": "6c5d3ca9-b4fc-49f3-bc1b-494622f6835f",
+      "icon": "📚",
+      "title": { "en": "General Collection", "gr": "Γενική Συλλογή" },
+      "description": {
+        "en": "Over 55,000 volumes spanning literature, science, history, philosophy and the arts. Open to all registered members free of charge.",
+        "gr": "Πάνω από 55.000 τόμοι που καλύπτουν λογοτεχνία, επιστήμη, ιστορία, φιλοσοφία και τέχνες."
+      }
+    },
+    {
+      "id": "9ae9b5bd-8f03-4f91-a08f-c92236c61350",
+      "icon": "🏺",
+      "title": { "en": "Rare Books", "gr": "Σπάνια Βιβλία" },
+      "description": {
+        "en": "A curated selection of rare and antiquarian volumes, including early printed books and illuminated manuscripts from the Aegean region.",
+        "gr": "Επιλεγμένοι σπάνιοι τόμοι, συμπεριλαμβανομένων παλαιών εκτυπωμένων βιβλίων και χειρογράφων από τον Αιγαιακό χώρο."
+      }
+    },
+    {
+      "id": "7166b9f7-4d53-4712-8c26-7ad3d049f51f",
+      "icon": "✒️",
+      "title": { "en": "Vernardakis Archive", "gr": "Αρχείο Βερναρδάκη" },
+      "description": {
+        "en": "The personal archive of Demetrios Vernardakis (1833–1907), historian and playwright from Lesbos, comprising manuscripts, correspondence and personal documents.",
+        "gr": "Το προσωπικό αρχείο του Δημητρίου Βερναρδάκη (1833–1907), ιστορικού και δραματουργού από τη Λέσβο."
+      }
+    },
+    {
+      "id": "ce0ef625-2dc7-4fc4-b425-16a3ec2e206b",
+      "icon": "🗺️",
+      "title": { "en": "Lefkias Historical Archive", "gr": "Αρχείο Λεφκία" },
+      "description": {
+        "en": "A major archive of historical documents, maps, photographs and press clippings relating to the history of Lesbos from the 19th century to the present.",
+        "gr": "Ένα σημαντικό αρχείο ιστορικών εγγράφων, χαρτών, φωτογραφιών και αποκομμάτων Τύπου για την ιστορία της Λέσβου."
+      }
+    },
+    {
+      "id": "f41b04f2-17d1-42fc-aac0-882ce19f9ad6",
+      "icon": "🎓",
+      "title": { "en": "Academic Journals", "gr": "Ακαδημαϊκά Περιοδικά" },
+      "description": {
+        "en": "An extensive collection of academic and scholarly journals across all disciplines, including digital access via the openABEKT national network.",
+        "gr": "Εκτεταμένη συλλογή ακαδημαϊκών περιοδικών σε όλους τους τομείς, με ψηφιακή πρόσβαση μέσω openABEKT."
+      }
+    },
+    {
+      "id": "dd0f66e2-c45d-4e98-9b86-c5607a6be2e5",
+      "icon": "💻",
+      "title": { "en": "Digital Catalogue", "gr": "Ψηφιακός Κατάλογος" },
+      "description": {
+        "en": "Full online catalogue access via Ψηφιακός Ηρόδοτος on the openABEKT platform. Search, reserve and explore the entire collection from any device.",
+        "gr": "Πλήρης διαδικτυακή πρόσβαση στον κατάλογο μέσω του Ψηφιακού Ηρόδοτου στην πλατφόρμα openABEKT."
+      }
+    }
+  ],
+  "hours": [
+    {
+      "id": "710968b9-6eec-4acd-becf-d17c4767ca6c",
+      "day": { "en": "Monday – Friday", "gr": "Δευτέρα – Παρασκευή" },
+      "time": { "en": "08:00 – 14:30", "gr": "08:00 – 14:30" },
+      "closed": false
+    },
+    {
+      "id": "320fdb0f-33d8-451c-94e1-7da28c5d6ab3",
+      "day": { "en": "Saturday", "gr": "Σάββατο" },
+      "time": { "en": "09:00 – 13:00", "gr": "09:00 – 13:00" },
+      "closed": false
+    },
+    {
+      "id": "d632f5a8-383f-4531-9fcb-79fcb48435ba",
+      "day": { "en": "Sunday", "gr": "Κυριακή" },
+      "time": { "en": "Closed", "gr": "Κλειστά" },
+      "closed": true
+    }
+  ],
+  "events": [
+    {
+      "id": "577321f0-74c1-4287-9f0e-cf4811d1f61d",
+      "date": { "en": "07 Nov 2023", "gr": "07 Νοε 2023" },
+      "title": {
+        "en": "Educational Action: Asia Minor Catastrophe 1922",
+        "gr": "Εκπαιδευτική Δράση: Μικρασιατική Καταστροφή 1922"
+      },
+      "summary": {
+        "en": "The library hosted the travelling Biblioskeui exhibition by the Aikaterini Laskaridis Foundation from 7 to 14 November 2023, dedicated to the Asia Minor Catastrophe of 1922.",
+        "gr": "Η βιβλιοθήκη φιλοξένησε από 7 έως 14 Νοεμβρίου τη Βιβλιοσκευή «Μικρασιατική Καταστροφή, 1922» του Ιδρύματος Αικατερίνη Λασκαρίδη."
+      },
+      "tag": { "en": "History", "gr": "Ιστορία" }
+    },
+    {
+      "id": "2d4153f2-75d4-4422-9e7f-abf694f59f83",
+      "date": { "en": "22 Jun 2023", "gr": "22 Ιουν 2023" },
+      "title": { "en": "A Colourful Reading Garden", "gr": "Ένας Πολύχρωμος Κήπος Φιλαναγνωσίας" },
+      "summary": {
+        "en": "The library's garden opened its doors for the summer to welcome readers of all ages for outdoor reading sessions among the orange trees.",
+        "gr": "Ο κήπος της βιβλιοθήκης διαμορφώθηκε και υποδέχτηκε μικρούς και μεγάλους φίλους για φιλαναγνωσία στον υπαίθριο χώρο."
+      },
+      "tag": { "en": "Community", "gr": "Κοινότητα" }
+    },
+    {
+      "id": "1435e58f-7da1-4cbf-a85a-63f1d5a8dc73",
+      "date": { "en": "19 Nov 2022", "gr": "19 Νοε 2022" },
+      "title": { "en": "Book Presentation", "gr": "Παρουσίαση Βιβλίου" },
+      "summary": {
+        "en": "The library invited the public to a book presentation held at the Model General Lyceum of Mytilene at the University of the Aegean on Saturday 19 November 2022 at 18:00.",
+        "gr": "Η βιβλιοθήκη προσκάλεσε το κοινό σε παρουσίαση βιβλίου στην αίθουσα εκδηλώσεων του Πρότυπου ΓΕ.Λ. Μυτιλήνης του Πανεπιστημίου Αιγαίου, Σάββατο 19 Νοεμβρίου 2022 στις 18:00."
+      },
+      "tag": { "en": "Literature", "gr": "Λογοτεχνία" }
+    },
+    {
+      "id": "41299be6-c2d5-4897-83f6-06270ec0e4e5",
+      "date": { "en": "03 Nov 2021", "gr": "03 Νοε 2021" },
+      "title": { "en": "Visit by Sykamia Primary School", "gr": "Επίσκεψη Δημοτικού Σχολείου Συκαμιάς" },
+      "summary": {
+        "en": "Students and teachers from Sykamia Primary School visited the library. The children learned about books and libraries, made their own bookmarks, and explored the new arrivals.",
+        "gr": "Μαθητές και εκπαιδευτικοί του Δημοτικού Σχολείου Συκαμιάς επισκέφθηκαν τη βιβλιοθήκη. Τα παιδιά μίλησαν για βιβλία, έφτιαξαν σελιδοδείκτες και ξεφύλλισαν τα καινούργια βιβλία."
+      },
+      "tag": { "en": "Children", "gr": "Παιδιά" }
+    }
+  ],
+  "contacts": [
+    {
+      "id": "efc77ec3-1d35-4f2f-b537-6dc88cdfaf88",
+      "label": { "en": "Address", "gr": "Διεύθυνση" },
+      "value": { "en": "Smyrnis Street, Mytilene 811 00", "gr": "Σμύρνης, Μυτιλήνη 811 00" }
+    },
+    {
+      "id": "fa74908f-f391-460a-9ea3-d83f2d08d2e6",
+      "label": { "en": "Telephone", "gr": "Τηλέφωνο" },
+      "value": { "en": "2251 040134", "gr": "2251 040134" }
+    },
+    {
+      "id": "6914a39d-fd2d-42a6-8f98-6c9f45ef2648",
+      "label": { "en": "Website", "gr": "Ιστότοπος" },
+      "value": { "en": "cplm.gr", "gr": "cplm.gr" }
+    },
+    {
+      "id": "3dbe85c6-6dde-4f4e-b3ce-59e62f9d2fd8",
+      "label": { "en": "Building", "gr": "Κτήριο" },
+      "value": { "en": "Former Doukarou Clinic, historic city centre", "gr": "Παλαιά Κλινική Δούκαρου, ιστορικό κέντρο πόλης" }
+    },
+    {
+      "id": "8faf8a3a-3094-41ae-a1d8-4f8eb342e5fc",
+      "label": { "en": "Membership", "gr": "Εγγραφή Μέλους" },
+      "value": { "en": "Free — visit in person", "gr": "Δωρεάν — αυτοπρόσωπη εγγραφή" }
+    },
+    {
+      "id": "5f4c2298-69a0-4e14-8fd9-4cf3f89ce8ae",
+      "label": { "en": "Digital Catalogue", "gr": "Ψηφιακός Κατάλογος" },
+      "value": { "en": "cplm.gr · eopac-libmytilini.abekt.gr", "gr": "Ψηφιακός Ηρόδοτος — openABEKT · cplm.gr" }
+    }
+  ],
+  "modelIntro": {
+    "en": "An interactive 3D reconstruction of the Public Central Library of Mytilene. Explore both floors, bookshelves, reading halls, the neoclassical facade and the garden.",
+    "gr": "Ένα διαδραστικό 3D μοντέλο της Δημόσιας Κεντρικής Βιβλιοθήκης Μυτιλήνης. Εξερευνήστε και τους δύο ορόφους, τα ράφια, τις αίθουσες, την πρόσοψη και τον κήπο."
+  },
+  "modelViews": [
+    {
+      "id": "4f50ae63-2321-4c16-93ea-8f8ea586f6ad",
+      "title": { "en": "Street View", "gr": "Θέα από τον Δρόμο" },
+      "description": {
+        "en": "The library on Smyrnis Street with its neoclassical geometry, terracotta roof and burgundy arched windows.",
+        "gr": "Η βιβλιοθήκη στην οδό Σμύρνης με νεοκλασική γεωμετρία, τερακότα στέγη και τοξωτά παράθυρα."
+      }
+    },
+    {
+      "id": "cbaf8a87-a802-4d86-b9a7-8e5ef5fdb9e2",
+      "title": { "en": "Front Facade", "gr": "Πρόσοψη" },
+      "description": {
+        "en": "The semicircular pediment, red entrance door and symmetrical front windows.",
+        "gr": "Το ημικυκλικό αέτωμα, η κόκκινη είσοδος και τα συμμετρικά παράθυρα πρόσοψης."
+      }
+    },
+    {
+      "id": "058bc36e-eb58-4132-8d4f-a4817055b98e",
+      "title": { "en": "Ground Floor", "gr": "Ισόγειο" },
+      "description": {
+        "en": "Reading hall layout with shelves, tables and internal circulation to the upper level.",
+        "gr": "Διάταξη αίθουσας ανάγνωσης με ράφια, τραπέζια και πρόσβαση προς τον επάνω όροφο."
+      }
+    },
+    {
+      "id": "742d2759-cf88-42d0-b8b2-a3d6f1637141",
+      "title": { "en": "First Floor", "gr": "Πρώτος Όροφος" },
+      "description": {
+        "en": "Upper-level collections including archives, journals and focused reading areas.",
+        "gr": "Συλλογές επάνω ορόφου με αρχεία, περιοδικά και χώρους μελέτης."
+      }
+    },
+    {
+      "id": "f665cfd2-4c3d-4453-b470-d5b0b8ae849f",
+      "title": { "en": "Aerial View", "gr": "Αεροφωτογραφία" },
+      "description": {
+        "en": "Top-down view of the roof, courtyard, fence and surrounding context.",
+        "gr": "Άνωθεν θέα της στέγης, της αυλής, του φράχτη και του περιβάλλοντος χώρου."
+      }
+    },
+    {
+      "id": "fbe8537d-9b8f-4335-aed0-9f9d9a5ae47a",
+      "title": { "en": "Garden Side", "gr": "Κήπος" },
+      "description": {
+        "en": "Orange trees and side façade elements from the old Doukarou clinic grounds.",
+        "gr": "Πορτοκαλιές και πλευρικά στοιχεία της πρόσοψης από τον χώρο της παλιάς Κλινικής Δούκαρου."
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Public Central Library of Mytilene",
+  "short_name": "Library Mytilene",
+  "description": "Public Central Library of Mytilene web app.",
+  "lang": "el",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e0c0a",
+  "theme_color": "#0e0c0a"
+}
