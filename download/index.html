@@ -25,15 +25,22 @@
       <a href="https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest/download/central-library-android.apk">Download Android APK</a>
       <a href="https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest">Open Latest Release</a>
     </div>
-    <p class="small">Tip: iPhone users should open in Safari and choose “Add to Home Screen”.</p>
+    <p class="small" id="redirectNote">Tip: iPhone users should open in Safari and choose “Add to Home Screen”.</p>
   </main>
   <script>
     (function () {
       const ua = navigator.userAgent || '';
       const isAndroid = /Android/i.test(ua);
-      if (isAndroid) {
-        window.location.replace('https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest/download/central-library-android.apk');
+      if (!isAndroid) return;
+
+      const note = document.getElementById('redirectNote');
+      if (note) {
+        note.textContent = 'Android detected. Redirecting to APK download in 3 seconds...';
       }
+
+      setTimeout(function () {
+        window.location.replace('https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases/latest/download/central-library-android.apk');
+      }, 3000);
     })();
   </script>
 </body>

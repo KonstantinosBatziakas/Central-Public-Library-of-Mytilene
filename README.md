@@ -19,6 +19,8 @@ This repository includes a native iOS app source scaffold in:
 - Bundled offline content model in:
   - `ios-app/CentralLibraryApp/Resources/library_content.json`
 - Embedded local 3D model experience using `WKWebView`
+- Instant language syncing between app UI and embedded 3D experience
+- Liquid-glass inspired visual style with material backgrounds and futuristic accents
 
 ## Mobile Access Strategy
 
