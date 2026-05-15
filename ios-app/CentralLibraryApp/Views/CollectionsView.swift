@@ -19,11 +19,14 @@ struct CollectionsView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .glassCard()
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("\(item.title.value(for: model.language)). \(item.description.value(for: model.language))")
                     }
                 }
                 .padding()
             }
         }
+        .dynamicTypeSize(.xSmall ... .accessibility3)
         .navigationTitle(model.language == .greek ? "Συλλογές" : "Collections")
         .navigationBarTitleDisplayMode(.inline)
     }

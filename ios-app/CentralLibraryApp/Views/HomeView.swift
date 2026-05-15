@@ -35,12 +35,15 @@ struct HomeView: View {
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .glassCard()
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(stat.label.value(for: model.language)): \(stat.value)")
                         }
                     }
                 }
                 .padding()
             }
         }
+        .dynamicTypeSize(.xSmall ... .accessibility3)
         .navigationTitle(model.language == .greek ? "Αρχική" : "Home")
         .navigationBarTitleDisplayMode(.inline)
     }

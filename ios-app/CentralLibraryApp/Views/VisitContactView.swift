@@ -23,6 +23,8 @@ struct VisitContactView: View {
                                 .foregroundStyle(hour.closed ? .white.opacity(0.5) : Theme.warmAccent)
                         }
                         .glassCard()
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("\(hour.day.value(for: model.language)): \(hour.time.value(for: model.language))")
                     }
 
                     Text(model.language == .greek ? "Επικοινωνία" : "Contact")
@@ -41,11 +43,14 @@ struct VisitContactView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .glassCard()
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("\(item.label.value(for: model.language)): \(item.value.value(for: model.language))")
                     }
                 }
                 .padding()
             }
         }
+        .dynamicTypeSize(.xSmall ... .accessibility3)
         .navigationTitle(model.language == .greek ? "Επίσκεψη" : "Visit")
         .navigationBarTitleDisplayMode(.inline)
     }

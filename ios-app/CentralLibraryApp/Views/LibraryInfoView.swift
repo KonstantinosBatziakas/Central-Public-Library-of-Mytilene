@@ -17,11 +17,13 @@ struct LibraryInfoView: View {
                             .font(.body)
                             .foregroundStyle(.white.opacity(0.9))
                             .glassCard()
+                            .accessibilityLabel(paragraph.value(for: model.language))
                     }
                 }
                 .padding()
             }
         }
+        .dynamicTypeSize(.xSmall ... .accessibility3)
         .navigationTitle(model.language == .greek ? "Πληροφορίες" : "Library Info")
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -13,6 +13,7 @@ struct Experience3DView: View {
                     .foregroundStyle(.white.opacity(0.9))
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityLabel(model.content.modelIntro.value(for: model.language))
 
                 LocalModelWebView(language: model.language)
                     .frame(minHeight: 320)
@@ -22,6 +23,7 @@ struct Experience3DView: View {
                             .stroke(.white.opacity(0.2), lineWidth: 1)
                     )
                     .padding(.horizontal)
+                    .accessibilityLabel(model.language == .greek ? "Διαδραστικό 3D μοντέλο βιβλιοθήκης" : "Interactive 3D library model")
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
@@ -37,6 +39,8 @@ struct Experience3DView: View {
                             }
                             .frame(width: 220, alignment: .leading)
                             .glassCard()
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(view.title.value(for: model.language)). \(view.description.value(for: model.language))")
                         }
                     }
                     .padding(.horizontal)
@@ -45,6 +49,7 @@ struct Experience3DView: View {
             }
             .padding(.vertical)
         }
+        .dynamicTypeSize(.xSmall ... .accessibility3)
         .navigationTitle(model.language == .greek ? "3D Εμπειρία" : "3D Experience")
         .navigationBarTitleDisplayMode(.inline)
     }

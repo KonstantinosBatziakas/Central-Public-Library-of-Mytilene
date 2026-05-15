@@ -33,11 +33,14 @@ struct EventsView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .glassCard()
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("\(event.date.value(for: model.language)). \(event.title.value(for: model.language)). \(event.summary.value(for: model.language)). \(event.tag.value(for: model.language))")
                     }
                 }
                 .padding()
             }
         }
+        .dynamicTypeSize(.xSmall ... .accessibility3)
         .navigationTitle(model.language == .greek ? "Εκδηλώσεις" : "Events")
         .navigationBarTitleDisplayMode(.inline)
     }

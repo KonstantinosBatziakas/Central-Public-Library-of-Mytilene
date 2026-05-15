@@ -87,7 +87,7 @@
     },
     {
       "id": "dd0f66e2-c45d-4e98-9b86-c5607a6be2e5",
-      "icon": "��",
+      "icon": "💻",
       "title": { "en": "Digital Catalogue", "gr": "Ψηφιακός Κατάλογος" },
       "description": {
         "en": "Full online catalogue access via Ψηφιακός Ηρόδοτος on the openABEKT platform. Search, reserve and explore the entire collection from any device.",
@@ -179,7 +179,7 @@
     {
       "id": "3dbe85c6-6dde-4f4e-b3ce-59e62f9d2fd8",
       "label": { "en": "Building", "gr": "Κτήριο" },
-      "value": { "en": "Former Doukarou Clinic", "gr": "Παλαιά Κλινική Δούκαρου, κέντρο πόλης" }
+      "value": { "en": "Former Doukarou Clinic, historic city centre", "gr": "Παλαιά Κλινική Δούκαρου, ιστορικό κέντρο πόλης" }
     },
     {
       "id": "8faf8a3a-3094-41ae-a1d8-4f8eb342e5fc",
@@ -189,7 +189,7 @@
     {
       "id": "5f4c2298-69a0-4e14-8fd9-4cf3f89ce8ae",
       "label": { "en": "Digital Catalogue", "gr": "Ψηφιακός Κατάλογος" },
-      "value": { "en": "eopac-libmytilini.abekt.gr", "gr": "Ψηφιακός Ηρόδοτος — openABEKT" }
+      "value": { "en": "cplm.gr · eopac-libmytilini.abekt.gr", "gr": "Ψηφιακός Ηρόδοτος — openABEKT · cplm.gr" }
     }
   ],
   "modelIntro": {

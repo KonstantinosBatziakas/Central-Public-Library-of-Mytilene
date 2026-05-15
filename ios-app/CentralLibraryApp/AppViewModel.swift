@@ -18,12 +18,13 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 final class AppViewModel: ObservableObject {
     @Published var language: AppLanguage {
         didSet {
-            UserDefaults.standard.set(language.rawValue, forKey: Self.languageKey)
+            defaults.set(language.rawValue, forKey: Self.languageKey)
         }
     }
 
     @Published private(set) var content: LibraryContent
 
+    private let defaults: UserDefaults
     private static let languageKey = "library.app.language"
     private static let minimumCollectionsCount = 6
     private static let minimumHoursCount = 3
@@ -31,10 +32,14 @@ final class AppViewModel: ObservableObject {
     private static let minimumContactsCount = 6
     private static let minimumModelViewsCount = 6
 
-    init() {
-        let saved = UserDefaults.standard.string(forKey: Self.languageKey)
+    init(
+        defaults: UserDefaults = .standard,
+        contentLoader: () -> LibraryContent = ContentRepository.loadContent
+    ) {
+        self.defaults = defaults
+        let saved = defaults.string(forKey: Self.languageKey)
         self.language = AppLanguage(rawValue: saved ?? "en") ?? .english
-        self.content = ContentRepository.loadContent()
+        self.content = contentLoader()
         validateCompleteness(content: content)
     }
 

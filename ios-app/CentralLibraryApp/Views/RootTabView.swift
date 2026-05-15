@@ -29,10 +29,13 @@ struct RootTabView: View {
                     Button(action: model.toggleLanguage) {
                         Text(model.language == .english ? "EN / ΕΛ" : "ΕΛ / EN")
                             .font(.caption.bold())
+                            .frame(minWidth: 64, minHeight: 44)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(Theme.warmAccent.opacity(0.85))
                     .accessibilityLabel(tabTitle("Switch language", "Αλλαγή γλώσσας"))
+                    .accessibilityHint(tabTitle("Toggles between English and Greek", "Εναλλάσσει Αγγλικά και Ελληνικά"))
+                    .accessibilityValue(model.language == .english ? "English" : "Ελληνικά")
                 }
             }
         }

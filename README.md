@@ -26,3 +26,31 @@ This repository now includes a native iOS app source scaffold in:
 - The app source is designed for Xcode/iOS and should be added to an iOS target in Xcode.
 - The 3D model HTML is bundled locally at:
   - `ios-app/CentralLibraryApp/Resources/library-3d.html`
+
+### Xcode setup checklist
+
+1. Create or open an iOS App project in Xcode.
+2. Add all files from:
+   - `ios-app/CentralLibraryApp`
+3. Ensure app source files are in the app target.
+4. Ensure resources are in **Copy Bundle Resources**:
+   - `ios-app/CentralLibraryApp/Resources/library_content.json`
+   - `ios-app/CentralLibraryApp/Resources/library-3d.html`
+5. Add the test file folder to a unit test target:
+   - `ios-app/CentralLibraryAppTests`
+
+### Manual QA checklist (Xcode simulators)
+
+- Run on **iPhone** and **iPad** simulators.
+- Verify:
+  - Tab navigation across all sections.
+  - Greek/English toggle updates all tabs.
+  - Language persists after app relaunch.
+  - 3D view loads correctly.
+- Accessibility pass:
+  - Dynamic Type at larger sizes.
+  - VoiceOver reads key labels and cards.
+  - Touch targets are comfortably tappable.
+  - Contrast/readability in light and dark appearance.
+- 3D performance pass on older simulator profiles:
+  - If interaction is not smooth, track a Phase 2 spike for SceneKit/RealityKit migration.
