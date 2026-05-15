@@ -4,7 +4,7 @@
 
 This repository now includes a native iOS app source scaffold in:
 
-`/home/runner/work/Central-Public-Library-of-Mytilene/Central-Public-Library-of-Mytilene/ios-app/CentralLibraryApp`
+`ios-app/CentralLibraryApp`
 
 ### What is included
 
