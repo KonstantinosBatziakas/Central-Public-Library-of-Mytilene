@@ -54,3 +54,24 @@ This repository now includes a native iOS app source scaffold in:
   - Contrast/readability in light and dark appearance.
 - 3D performance pass on older simulator profiles:
   - If interaction is not smooth, track a Phase 2 spike for SceneKit/RealityKit migration.
+
+## Free Mobile Access (Web + Android APK)
+
+### iPhone users (free)
+
+- Open the hosted website in Safari.
+- Tap **Share**.
+- Tap **Add to Home Screen**.
+
+This gives app-like access without App Store publishing.
+
+### Android users (APK)
+
+- Publish Android APK files under:
+  - `https://github.com/KonstantinosBatziakas/Central-Public-Library-of-Mytilene/releases`
+- Users can download the latest APK directly from the Releases page.
+
+### PWA files included
+
+- `manifest.webmanifest`
+- `service-worker.js`
