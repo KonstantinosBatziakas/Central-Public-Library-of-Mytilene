@@ -48,7 +48,7 @@ A native Android WebView wrapper is available in:
 
 - `android-app/`
 
-The release workflow builds and signs an APK, then uploads it with a fixed filename:
+The release workflow builds a debug APK (no signing secrets), then uploads it with a fixed filename:
 
 - `central-library-android.apk`
 
@@ -70,7 +70,7 @@ The unified QR points to:
 
 On Android, this page auto-redirects to the latest APK download URL.
 
-## Android Release Flow
+## Android APK Flow
 
 Workflow file:
 
@@ -81,12 +81,7 @@ Triggers:
 - Release published
 - Manual workflow dispatch
 
-Required repository secrets for signing:
-
-- `ANDROID_KEYSTORE_BASE64`
-- `ANDROID_KEY_ALIAS`
-- `ANDROID_KEYSTORE_PASSWORD`
-- `ANDROID_KEY_PASSWORD`
+No repository signing secrets are required for this class distribution flow.
 
 ## End-to-End Validation Checklist
 

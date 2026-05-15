@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build-sign-upload:
+  build-upload:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,39 +28,15 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Validate signing secrets
-        run: |
-          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEY_ALIAS ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD; do
-            if [ -z "${!name}" ]; then
-              echo "Missing required secret: $name"
-              exit 1
-            fi
-          done
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-
-      - name: Build release APK
+      - name: Build debug APK
         working-directory: android-app
-        run: gradle :app:assembleRelease
-
-      - name: Sign APK
-        id: sign_app
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: android-app/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: gradle :app:assembleDebug
 
       - name: Prepare stable APK filename
         run: |
-          cp "${{ steps.sign_app.outputs.signedReleaseFile }}" central-library-android.apk
+          cp android-app/app/build/outputs/apk/debug/app-debug.apk central-library-android.apk
 
-      - name: Upload signed APK artifact
+      - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: central-library-android

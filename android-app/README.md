@@ -6,18 +6,13 @@ This folder contains a lightweight native Android wrapper around the hosted web 
 
 1. Install Android SDK + Java 17.
 2. From `android-app/` run:
-   - `gradle :app:assembleRelease`
+   - `gradle :app:assembleDebug`
 3. APK output:
-   - `android-app/app/build/outputs/apk/release/app-release.apk`
+   - `android-app/app/build/outputs/apk/debug/app-debug.apk`
 
-## Signing in CI
+## CI distribution (no signing secrets)
 
-The GitHub workflow `.github/workflows/android-apk-release.yml` signs the release APK when these secrets exist:
-
-- `ANDROID_KEYSTORE_BASE64`
-- `ANDROID_KEY_ALIAS`
-- `ANDROID_KEYSTORE_PASSWORD`
-- `ANDROID_KEY_PASSWORD`
+The GitHub workflow `.github/workflows/android-apk-release.yml` builds a debug APK and publishes it with the stable filename:
 
 The workflow publishes a stable asset name:
 
