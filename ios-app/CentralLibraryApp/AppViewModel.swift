@@ -25,6 +25,11 @@ final class AppViewModel: ObservableObject {
     @Published private(set) var content: LibraryContent
 
     private static let languageKey = "library.app.language"
+    private static let minimumCollectionsCount = 6
+    private static let minimumHoursCount = 3
+    private static let minimumEventsCount = 4
+    private static let minimumContactsCount = 6
+    private static let minimumModelViewsCount = 6
 
     init() {
         let saved = UserDefaults.standard.string(forKey: Self.languageKey)
@@ -40,11 +45,11 @@ final class AppViewModel: ObservableObject {
     private func validateCompleteness(content: LibraryContent) {
         var issues: [String] = []
         if content.aboutParagraphs.isEmpty { issues.append("About section is empty.") }
-        if content.collections.count < 6 { issues.append("Collections count is below expected website coverage.") }
-        if content.hours.count < 3 { issues.append("Opening hours count is below expected website coverage.") }
-        if content.events.count < 4 { issues.append("Events count is below expected website coverage.") }
-        if content.contacts.count < 6 { issues.append("Contacts count is below expected website coverage.") }
-        if content.modelViews.count < 6 { issues.append("3D view metadata is below expected website coverage.") }
+        if content.collections.count < Self.minimumCollectionsCount { issues.append("Collections count is below expected website coverage.") }
+        if content.hours.count < Self.minimumHoursCount { issues.append("Opening hours count is below expected website coverage.") }
+        if content.events.count < Self.minimumEventsCount { issues.append("Events count is below expected website coverage.") }
+        if content.contacts.count < Self.minimumContactsCount { issues.append("Contacts count is below expected website coverage.") }
+        if content.modelViews.count < Self.minimumModelViewsCount { issues.append("3D view metadata is below expected website coverage.") }
 
         guard !issues.isEmpty else { return }
         let message = "Library content completeness warnings: " + issues.joined(separator: " ")
