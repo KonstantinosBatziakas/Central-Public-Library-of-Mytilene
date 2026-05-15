@@ -12,7 +12,7 @@ This folder contains a lightweight native Android wrapper around the hosted web 
 
 ## CI distribution (no signing secrets)
 
-The GitHub workflow `.github/workflows/android-apk-release.yml` builds a debug APK and publishes it as:
+The GitHub workflow `.github/workflows/android-apk-release.yml` builds a debug APK and publishes it with the stable filename:
 
 The workflow publishes a stable asset name:
 
