@@ -144,6 +144,10 @@ jobs:
             print(f"Generated {folder} ({size}x{size})")
           PYEOF
 
+      - name: Remove adaptive icon overrides
+        run: |
+          rm -rf android-app/app/src/main/res/mipmap-anydpi-v26
+
       - name: Build debug APK
         working-directory: android-app
         run: gradle :app:assembleDebug
