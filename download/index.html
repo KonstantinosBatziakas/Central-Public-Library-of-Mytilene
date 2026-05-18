@@ -2,18 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0e0c0a" />
   <title>Mobile Download | Public Central Library of Mytilene</title>
   <style>
-    body{margin:0;font-family:Arial,sans-serif;background:#0e0c0a;color:#f5f0e8;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-    .card{max-width:720px;width:100%;border:1px solid rgba(184,149,42,.35);padding:24px;background:rgba(255,255,255,.03)}
-    h1{font-size:1.4rem;margin:0 0 10px;color:#d4af5a}
-    p{opacity:.85;line-height:1.6}
+    :root{--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--tap-size:44px}
+    body{margin:0;font-family:Arial,sans-serif;background:#0e0c0a;color:#f5f0e8;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;padding:calc(20px + var(--safe-top)) calc(16px + var(--safe-right)) calc(20px + var(--safe-bottom)) calc(16px + var(--safe-left))}
+    .card{max-width:720px;width:100%;border:1px solid rgba(184,149,42,.35);padding:clamp(18px,4vw,28px);background:rgba(255,255,255,.03)}
+    h1{font-size:clamp(1.2rem,4vw,1.6rem);margin:0 0 10px;color:#d4af5a;line-height:1.2}
+    p{opacity:.9;line-height:1.6}
     .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
-    a{display:inline-block;padding:10px 14px;border:1px solid rgba(184,149,42,.55);color:#f5f0e8;text-decoration:none;font-size:.9rem}
+    a{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid rgba(184,149,42,.55);color:#f5f0e8;text-decoration:none;font-size:.9rem;min-height:var(--tap-size)}
     a:hover{background:rgba(184,149,42,.1)}
-    .small{font-size:.8rem;opacity:.65;margin-top:14px}
+    a:focus-visible{outline:2px solid #d4af5a;outline-offset:3px}
+    .small{font-size:.8rem;opacity:.72;margin-top:14px}
+    @media (max-width:640px){
+      .actions{flex-direction:column}
+      a{width:100%}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation:none !important;transition:none !important}
+    }
   </style>
 </head>
 <body>
