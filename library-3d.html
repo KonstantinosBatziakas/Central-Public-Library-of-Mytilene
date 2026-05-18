@@ -12,9 +12,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#b8952a;--dark:#0d0b09;--parchment:#f5f0e8;--muted:#8b7f6e;--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px)}
-body{background:var(--dark);font-family:'Montserrat',sans-serif;overflow:hidden;height:100dvh;color:var(--parchment)}
+body{background:var(--dark);font-family:'Montserrat',sans-serif;overflow:hidden;height:100vh;height:100dvh;color:var(--parchment)}
 canvas{display:block}
-#wrap{width:100vw;height:100dvh;position:relative}
+#wrap{width:100vw;height:100vh;height:100dvh;position:relative}
 .ui{position:absolute;inset:0;pointer-events:none}
 .title-box{position:absolute;top:calc(18px + var(--safe-top));left:calc(18px + var(--safe-left));max-width:min(70vw,420px)}
 .lbl{font-size:0.5rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;font-weight:500}
@@ -110,7 +110,7 @@ canvas{display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||window.innerWidth<=980;
+const isMobile=window.matchMedia('(max-width: 980px), (pointer: coarse)').matches;
 const W=window.innerWidth, H=window.innerHeight;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x87CEEB);
