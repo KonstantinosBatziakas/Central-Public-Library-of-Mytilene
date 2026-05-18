@@ -6,33 +6,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης — 3D</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#b8952a;--dark:#0d0b09;--parchment:#f5f0e8;--muted:#8b7f6e}
-body{background:var(--dark);font-family:'Montserrat',sans-serif;overflow:hidden;height:100vh;color:var(--parchment)}
+:root{--gold:#b8952a;--dark:#0d0b09;--parchment:#f5f0e8;--muted:#8b7f6e;--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px)}
+body{background:var(--dark);font-family:'Montserrat',sans-serif;overflow:hidden;height:100dvh;color:var(--parchment)}
 canvas{display:block}
-#wrap{width:100vw;height:100vh;position:relative}
+#wrap{width:100vw;height:100dvh;position:relative}
 .ui{position:absolute;inset:0;pointer-events:none}
-.title-box{position:absolute;top:26px;left:34px}
+.title-box{position:absolute;top:calc(18px + var(--safe-top));left:calc(18px + var(--safe-left));max-width:min(70vw,420px)}
 .lbl{font-size:0.5rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;font-weight:500}
 .ttl{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:300;line-height:1.1;color:var(--parchment)}
 .ttl em{font-style:italic;color:var(--gold)}
 .sub{font-size:0.56rem;color:var(--muted);letter-spacing:0.07em;margin-top:3px}
-.views{position:absolute;top:26px;right:34px;display:flex;flex-direction:column;gap:6px;pointer-events:all}
-.vb{background:rgba(13,11,9,0.9);border:1px solid rgba(184,149,42,0.25);color:rgba(245,240,232,0.8);padding:9px 15px;font-family:'Montserrat',sans-serif;font-size:0.58rem;letter-spacing:0.13em;text-transform:uppercase;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(10px);font-weight:500}
+.views{position:absolute;top:calc(18px + var(--safe-top));right:calc(18px + var(--safe-right));display:flex;flex-direction:column;gap:6px;pointer-events:all}
+.vb{background:rgba(13,11,9,0.9);border:1px solid rgba(184,149,42,0.25);color:rgba(245,240,232,0.8);padding:11px 15px;font-family:'Montserrat',sans-serif;font-size:0.58rem;letter-spacing:0.13em;text-transform:uppercase;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(10px);font-weight:500;min-height:44px;white-space:nowrap}
 .vb:hover,.vb.on{background:rgba(184,149,42,0.12);border-color:var(--gold);color:var(--gold)}
-.info{position:absolute;bottom:26px;left:34px;background:rgba(13,11,9,0.92);border:1px solid rgba(184,149,42,0.18);padding:17px 22px;max-width:310px;backdrop-filter:blur(10px)}
+.vb:focus-visible,.zb:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.info{position:absolute;bottom:calc(18px + var(--safe-bottom));left:calc(18px + var(--safe-left));background:rgba(13,11,9,0.92);border:1px solid rgba(184,149,42,0.18);padding:17px 22px;max-width:340px;backdrop-filter:blur(10px)}
 .ititle{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);margin-bottom:6px;font-weight:400}
 .idesc{font-size:0.68rem;color:rgba(245,240,232,0.55);line-height:1.75;font-weight:300}
-.hint{position:absolute;bottom:26px;right:34px;text-align:right}
+.hint{position:absolute;bottom:calc(18px + var(--safe-bottom));right:calc(18px + var(--safe-right));text-align:right}
 .hint p{font-size:0.54rem;color:rgba(245,240,232,0.25);letter-spacing:0.07em;line-height:2}
 .hint span{color:rgba(184,149,42,0.55)}
 /* ZOOM CONTROLS */
-.zoom-controls{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:all}
-.zb{background:rgba(13,11,9,0.92);border:1px solid rgba(184,149,42,0.3);color:var(--gold);width:42px;height:42px;font-size:1.4rem;line-height:1;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-weight:300;font-family:'Cormorant Garamond',serif;user-select:none}
+.zoom-controls{position:absolute;bottom:calc(18px + var(--safe-bottom));left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:all}
+.zb{background:rgba(13,11,9,0.92);border:1px solid rgba(184,149,42,0.3);color:var(--gold);width:50px;height:50px;font-size:1.4rem;line-height:1;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-weight:300;font-family:'Cormorant Garamond',serif;user-select:none}
 .zb:hover{background:rgba(184,149,42,0.15);border-color:var(--gold)}
 .zb:active{background:rgba(184,149,42,0.3);transform:scale(0.93)}
 .zoom-label{font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(184,149,42,0.45);text-align:center;margin-top:4px;font-family:'Montserrat',sans-serif}
@@ -42,6 +43,25 @@ canvas{display:block}
 .bar{width:200px;height:1px;background:rgba(184,149,42,0.15);position:relative;overflow:hidden}
 .bar::after{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:var(--gold);animation:load 1.5s ease infinite}
 @keyframes load{to{left:100%}}
+@media(max-width:980px){
+  .title-box{top:calc(12px + var(--safe-top));left:calc(12px + var(--safe-left));max-width:90vw}
+  .ttl{font-size:1.2rem}
+  .sub{font-size:0.52rem}
+  .views{top:auto;right:calc(12px + var(--safe-right));left:calc(12px + var(--safe-left));bottom:calc(84px + var(--safe-bottom));flex-direction:row;overflow-x:auto;padding-bottom:2px}
+  .vb{flex:0 0 auto;font-size:0.52rem;padding:10px 12px}
+  .info{max-width:none;right:calc(12px + var(--safe-right));left:calc(12px + var(--safe-left));bottom:calc(152px + var(--safe-bottom));padding:12px 14px}
+  .hint{display:none}
+  .zoom-controls{bottom:calc(12px + var(--safe-bottom))}
+}
+@media(max-width:640px){
+  .lbl{font-size:0.46rem}
+  .ttl{font-size:1.02rem}
+  .idesc{font-size:0.62rem;line-height:1.55}
+  .zoom-label{font-size:0.42rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
 </style>
 </head>
 <body>
@@ -57,14 +77,14 @@ canvas{display:block}
       <div class="sub">Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης</div>
     </div>
     <div class="views">
-      <button class="vb on" id="vb-street" onclick="goView('street',event)">🏛 <span class="vb-txt">Street View</span></button>
-      <button class="vb" id="vb-front" onclick="goView('front',event)">🔍 <span class="vb-txt">Front Facade</span></button>
-      <button class="vb" id="vb-inside1" onclick="goView('inside1',event)">📚 <span class="vb-txt">Ground Floor</span></button>
-      <button class="vb" id="vb-inside2" onclick="goView('inside2',event)">📖 <span class="vb-txt">First Floor</span></button>
-      <button class="vb" id="vb-aerial" onclick="goView('aerial',event)">🗺 <span class="vb-txt">Aerial View</span></button>
-      <button class="vb" id="vb-garden" onclick="goView('garden',event)">🌿 <span class="vb-txt">Garden Side</span></button>
+      <button class="vb on" id="vb-street" onclick="goView('street',event)" aria-label="Street View">🏛 <span class="vb-txt">Street View</span></button>
+      <button class="vb" id="vb-front" onclick="goView('front',event)" aria-label="Front Facade">🔍 <span class="vb-txt">Front Facade</span></button>
+      <button class="vb" id="vb-inside1" onclick="goView('inside1',event)" aria-label="Ground Floor">📚 <span class="vb-txt">Ground Floor</span></button>
+      <button class="vb" id="vb-inside2" onclick="goView('inside2',event)" aria-label="First Floor">📖 <span class="vb-txt">First Floor</span></button>
+      <button class="vb" id="vb-aerial" onclick="goView('aerial',event)" aria-label="Aerial View">🗺 <span class="vb-txt">Aerial View</span></button>
+      <button class="vb" id="vb-garden" onclick="goView('garden',event)" aria-label="Garden Side">🌿 <span class="vb-txt">Garden Side</span></button>
     </div>
-    <div class="info">
+    <div class="info" role="status" aria-live="polite">
       <div class="ititle" id="ititle">Street View</div>
       <div class="idesc" id="idesc">The Public Central Library of Mytilene on Smyrnis Street. A two-storey neoclassical building with white plastered walls, terracotta hip roof, and distinctive burgundy red windows with arched frames. Founded 1913.</div>
     </div>
@@ -89,6 +109,8 @@ canvas{display:block}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||window.innerWidth<=980;
 const W=window.innerWidth, H=window.innerHeight;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x87CEEB);
@@ -97,9 +119,9 @@ scene.fog=new THREE.FogExp2(0xb0d4e8,0.012);
 const cam=new THREE.PerspectiveCamera(48,W/H,0.1,400);
 cam.position.set(0,10,32);
 
-const renderer=new THREE.WebGLRenderer({antialias:true});
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:isMobile?'low-power':'high-performance'});
 renderer.setSize(W,H);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.5:2));
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -109,7 +131,7 @@ document.getElementById('wrap').appendChild(renderer.domElement);
 const amb=new THREE.AmbientLight(0xfff5e0,0.5);scene.add(amb);
 const sun=new THREE.DirectionalLight(0xfff0d0,2.0);
 sun.position.set(18,30,20);sun.castShadow=true;
-sun.shadow.mapSize.set(4096,4096);
+sun.shadow.mapSize.set(isMobile?2048:4096,isMobile?2048:4096);
 sun.shadow.camera.left=-35;sun.shadow.camera.right=35;
 sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
 sun.shadow.camera.far=100;
@@ -610,7 +632,7 @@ function lerp(a,b,t){return a+(b-a)*t}
 function animate(){
   requestAnimationFrame(animate);
   if(animating&&aTgt){
-    const sp=0.045;
+    const sp=reduceMotion?0.16:0.045;
     sph.th=lerp(sph.th,aTgt.th,sp);
     sph.ph=lerp(sph.ph,aTgt.ph,sp);
     sph.r=lerp(sph.r,aTgt.r,sp);
@@ -620,7 +642,9 @@ function animate(){
     if(Math.abs(sph.th-aTgt.th)+Math.abs(sph.ph-aTgt.ph)+Math.abs(sph.r-aTgt.r)<0.002)animating=false;
     updateCam();
   }
-  pl.intensity=0.75+Math.sin(Date.now()*0.003)*0.08;
+  if(!reduceMotion){
+    pl.intensity=0.75+Math.sin(Date.now()*0.003)*0.08;
+  }
   renderer.render(scene,cam);
 }
 animate();
