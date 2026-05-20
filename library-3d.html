@@ -132,10 +132,13 @@ canvas{display:block}
 const loadingEl=document.getElementById('loading');
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isMobile=window.matchMedia('(max-width: 980px), (pointer: coarse)').matches;
-const LOADING_TIMEOUT_MS=isMobile?45000:20000;
-let loadingWatchdog=setTimeout(()=>{
-  showLoadError('Building the 3D model is taking longer than expected. Please refresh and try again.');
-},LOADING_TIMEOUT_MS);
+const ua=navigator.userAgent||'';
+const isIPhone=/iPhone/i.test(ua);
+const isIOS=/(iPad|iPhone|iPod)/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const lowMemoryDevice=typeof navigator.deviceMemory==='number' && navigator.deviceMemory<=4;
+const liteMode=isIPhone || (isIOS && isMobile) || lowMemoryDevice;
+const LOADING_TIMEOUT_MS=liteMode?70000:(isMobile?50000:22000);
+let loadingWatchdog=null;
 
 function showLoadError(message){
   if(!loadingEl)return;
@@ -146,6 +149,24 @@ function showLoadError(message){
   if(bar)bar.style.display='none';
 }
 
+function updateLoadingStatus(message){
+  if(!loadingEl)return;
+  const text=loadingEl.querySelector('p');
+  if(text)text.textContent=message;
+}
+
+function startLoadingWatchdog(){
+  if(loadingWatchdog)clearTimeout(loadingWatchdog);
+  loadingWatchdog=setTimeout(()=>{
+    showLoadError('Building the 3D model is taking longer than expected on this device. Please wait or refresh.');
+  },LOADING_TIMEOUT_MS);
+}
+
+function failStartup(message,err){
+  showLoadError(message);
+  if(err)console.error('[3D] startup failure',err);
+}
+
 function hideLoading(){
   if(loadingWatchdog){
     clearTimeout(loadingWatchdog);
@@ -154,11 +175,22 @@ function hideLoading(){
   if(loadingEl)loadingEl.style.display='none';
 }
 
+window.addEventListener('error',e=>{
+  console.error('[3D] runtime error',e.error||e.message);
+});
+window.addEventListener('unhandledrejection',e=>{
+  console.error('[3D] unhandled rejection',e.reason);
+});
+
+startLoadingWatchdog();
+
 if(!window.THREE){
-  showLoadError('Unable to load the 3D engine. Check your connection and reload.');
+  failStartup('Unable to load the 3D engine. Check your connection and reload.');
   throw new Error('Three.js failed to load');
 }
 
+try{
+  updateLoadingStatus(liteMode?'Preparing iPhone optimized 3D scene…':'Building 3D Model…');
 const W=window.innerWidth, H=window.innerHeight;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x87CEEB);
@@ -169,24 +201,28 @@ cam.position.set(0,10,32);
 
 let renderer;
 try{
-  renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:isMobile?'low-power':'high-performance'});
+  renderer=new THREE.WebGLRenderer({
+    antialias:!liteMode,
+    powerPreference:(isMobile||liteMode)?'low-power':'high-performance',
+    alpha:false
+  });
 }catch(err){
-  showLoadError('Your device cannot start the 3D view. Please use another browser or device.');
+  failStartup('Your device cannot start the 3D view. Please use another browser or device.',err);
   throw err;
 }
 renderer.setSize(W,H);
-renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.5:2));
-const enableHighQualityShadows=!isMobile;
-renderer.shadowMap.enabled=enableHighQualityShadows;
+renderer.setPixelRatio(Math.min(devicePixelRatio,liteMode?1:(isMobile?1.35:2)));
+const enableHighQualityShadows=!isMobile && !liteMode;
+renderer.shadowMap.enabled=!liteMode;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.15;
+renderer.toneMappingExposure=liteMode?1.05:1.15;
 document.getElementById('wrap').appendChild(renderer.domElement);
 
 const amb=new THREE.AmbientLight(0xfff5e0,0.5);scene.add(amb);
 const sun=new THREE.DirectionalLight(0xfff0d0,2.0);
 sun.position.set(18,30,20);sun.castShadow=enableHighQualityShadows;
-sun.shadow.mapSize.set(enableHighQualityShadows?4096:2048,enableHighQualityShadows?4096:2048);
+sun.shadow.mapSize.set(enableHighQualityShadows?4096:1024,enableHighQualityShadows?4096:1024);
 sun.shadow.camera.left=-35;sun.shadow.camera.right=35;
 sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
 sun.shadow.camera.far=100;
@@ -244,12 +280,33 @@ function B(w,h,d,mat,x,y,z,ry){
   m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
 }
 function C(rt,rb,h,seg,mat,x,y,z){
-  const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),mat);
+  const segCount=liteMode?Math.max(4,Math.floor(seg*0.6)):seg;
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,segCount),mat);
   m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
 }
 function S(r,seg,mat,x,y,z){
-  const m=new THREE.Mesh(new THREE.SphereGeometry(r,seg,seg),mat);
+  const segCount=liteMode?Math.max(4,Math.floor(seg*0.6)):seg;
+  const m=new THREE.Mesh(new THREE.SphereGeometry(r,segCount,segCount),mat);
   m.position.set(x,y,z);m.castShadow=true;scene.add(m);return m;
+}
+
+const deferredSceneTasks=[];
+function deferSceneTask(task){
+  deferredSceneTasks.push(task);
+}
+function runDeferredSceneTasks(){
+  if(!deferredSceneTasks.length)return;
+  let idx=0;
+  const run=()=>{
+    if(idx>=deferredSceneTasks.length)return;
+    try{
+      deferredSceneTasks[idx++]();
+    }catch(err){
+      console.error('[3D] deferred task failed',err);
+    }
+    requestAnimationFrame(run);
+  };
+  requestAnimationFrame(run);
 }
 
 B(100,0.2,100,M.pavement,0,-0.1,0);
@@ -344,12 +401,13 @@ function archWindow(x,y,z,w,h,rot){
   const g=new THREE.Group();
   const fr=new THREE.Mesh(new THREE.BoxGeometry(w+0.35,h+0.3,0.22),M.winFrame);g.add(fr);
   const gl=new THREE.Mesh(new THREE.BoxGeometry(w,h,0.12),M.glass);gl.position.z=0.06;g.add(gl);
-  for(let a=0;a<=Math.PI;a+=Math.PI/10){
+  const arcStep=Math.PI/(liteMode?6:10);
+  for(let a=0;a<=Math.PI;a+=arcStep){
     const ax=Math.cos(a)*w/2,ay=Math.sin(a)*w/2;
     const tb=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.18,0.22),M.winFrame);
     tb.position.set(ax,h/2+ay,0);g.add(tb);
   }
-  const ag=new THREE.Mesh(new THREE.CylinderGeometry(w/2,w/2,0.12,16,1,false,0,Math.PI),M.glass);
+  const ag=new THREE.Mesh(new THREE.CylinderGeometry(w/2,w/2,0.12,liteMode?10:16,1,false,0,Math.PI),M.glass);
   ag.rotation.z=Math.PI/2;ag.position.set(0,h/2+w/4,0.06);g.add(ag);
   const sl=new THREE.Mesh(new THREE.BoxGeometry(w/2,h,0.08),M.shutter);sl.position.set(-w*0.75,0,0.02);g.add(sl);
   const sr=new THREE.Mesh(new THREE.BoxGeometry(w/2,h,0.08),M.shutter);sr.position.set(w*0.75,0,0.02);g.add(sr);
@@ -389,24 +447,6 @@ B(3.2,0.5,0.85,M.stair,0,0.25,7.65);
 B(3.6,0.35,0.85,M.stair,0,0.08,8.52);
 B(4.0,0.18,0.85,M.stair,0,0.04,9.38);
 
-const fenceY=0.8,fenceH=1.6;
-for(let x=-10;x<-1.5;x+=0.7){B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.4);}
-B(0.15,fenceH+0.2,0.15,M.fencePost,-10,fenceY,-7.4);
-B(8.5,0.08,0.08,M.iron,-5.8,fenceY+fenceH/2,-7.4);
-B(8.5,0.08,0.08,M.iron,-5.8,fenceY-fenceH/2+0.15,-7.4);
-for(let x=1.5;x<=10;x+=0.7){B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.4);}
-B(0.15,fenceH+0.2,0.15,M.fencePost,10,fenceY,-7.4);
-B(8.5,0.08,0.08,M.iron,5.8,fenceY+fenceH/2,-7.4);
-B(8.5,0.08,0.08,M.iron,5.8,fenceY-fenceH/2+0.15,-7.4);
-B(0.22,fenceH+0.4,0.22,M.fencePost,-1.5,fenceY,-7.4);
-B(0.22,fenceH+0.4,0.22,M.fencePost,1.5,fenceY,-7.4);
-for(let x=-1.3;x<0;x+=0.35)B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.38);
-for(let x=0.1;x<=1.3;x+=0.35)B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.38);
-for(let z=-7.4;z<=6.5;z+=0.7){
-  B(0.06,fenceH,0.06,M.iron,-10,fenceY,z);
-  B(0.06,fenceH,0.06,M.iron,10,fenceY,z);
-}
-
 function boxwood(x,z){
   B(0.7,0.5,0.7,M.fence,x,0.25,z);
   C(0.45,0.45,0.9,8,M.boxwood,x,0.95,z);
@@ -423,15 +463,13 @@ B(1.6,0.22,0.04,M.flag,-7.2,4.72,5.5);
 
 function orangeTree(x,z){
   C(0.18,0.22,3,6,M.treeTrunk,x,1.5,z);
-  C(2.2,2.2,3,10,M.orangeLeaf,x,4.2,z);
-  C(1.6,1.6,2,10,M.orangeLeaf,x,5.6,z);
-  [-0.8,0,0.8,-0.4,0.4].forEach((ox,i)=>{
+  C(2.2,2.2,3,liteMode?7:10,M.orangeLeaf,x,4.2,z);
+  C(1.6,1.6,2,liteMode?7:10,M.orangeLeaf,x,5.6,z);
+  const oranges=liteMode?[-0.6,0,0.6]:[-0.8,0,0.8,-0.4,0.4];
+  oranges.forEach((ox,i)=>{
     S(0.18,6,M.orange,x+ox,4.0+i*0.3,z+Math.cos(i)*0.7);
   });
 }
-orangeTree(-14,0);orangeTree(-16,3);orangeTree(-15,-3);orangeTree(-13,5);
-C(0.8,0.8,1.2,8,M.treeLeaf,-15.5,0.6,-5);
-for(let x=-9;x<=9;x+=4){C(0.5,0.5,0.8,8,M.treeLeaf,x,0.4,-8.5);}
 
 B(21.6,0.15,13.6,M.iFloor,0,0.07,0);
 B(0.15,4.2,13.6,M.iWall,-10.92,2.1,0);
@@ -447,7 +485,8 @@ function fillShelf(sx,sy,sz,sw,rot){
   const back=new THREE.Mesh(new THREE.BoxGeometry(sw,3.2,0.18),M.shelf);
   back.position.set(sx,sy+1.6,sz);if(rot)back.rotation.y=rot;
   back.castShadow=true;back.receiveShadow=true;scene.add(back);
-  for(let s=0;s<4;s++){
+  const shelfCount=liteMode?2:4;
+  for(let s=0;s<shelfCount;s++){
     const sh=new THREE.Mesh(new THREE.BoxGeometry(sw,0.08,0.42),M.shelfDark);
     sh.position.set(sx,sy+0.3+s*0.95,sz);if(rot)sh.rotation.y=rot;
     sh.castShadow=true;scene.add(sh);
@@ -463,14 +502,10 @@ function fillShelf(sx,sy,sz,sw,rot){
         book.position.set(sx+boff+bw/2,sy+0.3+s*0.95+0.04+bh/2,sz+0.08);
       }
       book.castShadow=true;scene.add(book);
-      boff+=bw+0.01;
+      boff+=bw+(liteMode?0.05:0.01);
     }
   }
 }
-
-fillShelf(-9.3,0,-4,3.2);fillShelf(-9.3,0,0,3.2);fillShelf(-9.3,0,4,3.2);
-fillShelf(9.3,0,-4,3.2);fillShelf(9.3,0,0,3.2);fillShelf(9.3,0,4,3.2);
-fillShelf(-3.5,0,-5.4,3.0,Math.PI/2);fillShelf(3.5,0,-5.4,3.0,Math.PI/2);
 
 function readingTable(x,y,z){
   B(3.0,0.1,1.2,M.table,x,y+0.78,z);
@@ -480,28 +515,6 @@ function readingTable(x,y,z){
   B(0.3,0.04,0.22,M.bookR,x-0.5,y+0.84,z);
   B(0.3,0.04,0.22,M.bookB,x+0.4,y+0.84,z-0.1);
 }
-readingTable(-2.5,0,2.5);readingTable(2.5,0,2.5);readingTable(0,0,2.5);
-
-for(let s=0;s<9;s++){B(2.8,0.15,0.55,M.stair,-7.8,0.22+s*0.47,-5.2+s*0.55);}
-B(2.8,0.15,1.0,M.stair,-7.8,4.44,-1.3);
-B(0.12,4.4,4.8,M.iWall,-6.3,2.2,-2.8);
-
-B(21.6,0.15,13.6,M.iFloor,0,4.27,0);
-B(0.15,4.0,13.6,M.iWall,-10.92,6.3,0);
-B(0.15,4.0,13.6,M.iWall,10.92,6.3,0);
-B(21.6,4.0,0.15,M.iWall,0,6.3,-6.92);
-B(21.6,0.15,13.6,M.iCeil,0,8.32,0);
-
-fillShelf(-9.3,4.27,-4,3.2);fillShelf(-9.3,4.27,0,3.2);fillShelf(-9.3,4.27,4,3.2);
-fillShelf(9.3,4.27,-4,3.2);fillShelf(9.3,4.27,0,3.2);fillShelf(9.3,4.27,4,3.2);
-fillShelf(-3.5,4.27,-5.4,3.0,Math.PI/2);fillShelf(3.5,4.27,-5.4,3.0,Math.PI/2);
-fillShelf(0,4.27,-5.4,3.0,Math.PI/2);
-readingTable(-3,4.27,2);readingTable(3,4.27,2);
-
-const il1=new THREE.PointLight(0xffeecc,0.5,10);il1.position.set(0,7.5,-2);scene.add(il1);
-const il2=new THREE.PointLight(0xffeecc,0.4,10);il2.position.set(0,3.5,-2);scene.add(il2);
-
-B(22,0.06,8,M.pebble,0,0.03,-11.5);
 function streetLamp(x,z){
   C(0.06,0.08,5,6,M.iron,x,2.5,z);
   B(0.1,0.08,0.6,M.iron,x,5.1,z+0.25);
@@ -509,16 +522,68 @@ function streetLamp(x,z){
   S(0.15,8,M.glow,x,5.25,z+0.5);
   const lp=new THREE.PointLight(0xffdd66,0.7,9);lp.position.set(x,5.3,z+0.5);scene.add(lp);
 }
-streetLamp(-13,-12);streetLamp(13,-12);
+deferSceneTask(()=>{
+  updateLoadingStatus('Loading details…');
+  const fenceY=0.8,fenceH=1.6;
+  const fenceStep=liteMode?1.0:0.7;
+  for(let x=-10;x<-1.5;x+=fenceStep){B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.4);}
+  B(0.15,fenceH+0.2,0.15,M.fencePost,-10,fenceY,-7.4);
+  B(8.5,0.08,0.08,M.iron,-5.8,fenceY+fenceH/2,-7.4);
+  B(8.5,0.08,0.08,M.iron,-5.8,fenceY-fenceH/2+0.15,-7.4);
+  for(let x=1.5;x<=10;x+=fenceStep){B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.4);}
+  B(0.15,fenceH+0.2,0.15,M.fencePost,10,fenceY,-7.4);
+  B(8.5,0.08,0.08,M.iron,5.8,fenceY+fenceH/2,-7.4);
+  B(8.5,0.08,0.08,M.iron,5.8,fenceY-fenceH/2+0.15,-7.4);
+  B(0.22,fenceH+0.4,0.22,M.fencePost,-1.5,fenceY,-7.4);
+  B(0.22,fenceH+0.4,0.22,M.fencePost,1.5,fenceY,-7.4);
+  for(let x=-1.3;x<0;x+=(liteMode?0.5:0.35))B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.38);
+  for(let x=0.1;x<=1.3;x+=(liteMode?0.5:0.35))B(0.06,fenceH,0.06,M.iron,x,fenceY,-7.38);
+  for(let z=-7.4;z<=6.5;z+=fenceStep){
+    B(0.06,fenceH,0.06,M.iron,-10,fenceY,z);
+    B(0.06,fenceH,0.06,M.iron,10,fenceY,z);
+  }
 
-B(12,14,14,new THREE.MeshLambertMaterial({color:0xe0d4c0}),22,7,0);
-B(10,10,14,new THREE.MeshLambertMaterial({color:0xd8cbb8}),-21,5,0);
-B(14,0.5,14,new THREE.MeshLambertMaterial({color:0x9a6040}),22,14.25,0);
-B(10,0.5,14,new THREE.MeshLambertMaterial({color:0x9a6040}),-21,10.25,0);
+  orangeTree(-14,0);orangeTree(-16,3);orangeTree(-15,-3);orangeTree(-13,5);
+  C(0.8,0.8,1.2,8,M.treeLeaf,-15.5,0.6,-5);
+  for(let x=-9;x<=9;x+=4){C(0.5,0.5,0.8,8,M.treeLeaf,x,0.4,-8.5);}
 
-B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),0,0.02,-18.5);
-B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),3.5,0.02,-18.5);
-B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),-3.5,0.02,-18.5);
+  fillShelf(-9.3,0,-4,3.2);fillShelf(-9.3,0,0,3.2);fillShelf(-9.3,0,4,3.2);
+  fillShelf(9.3,0,-4,3.2);fillShelf(9.3,0,0,3.2);fillShelf(9.3,0,4,3.2);
+  fillShelf(-3.5,0,-5.4,3.0,Math.PI/2);fillShelf(3.5,0,-5.4,3.0,Math.PI/2);
+  readingTable(-2.5,0,2.5);readingTable(2.5,0,2.5);readingTable(0,0,2.5);
+
+  for(let s=0;s<9;s++){B(2.8,0.15,0.55,M.stair,-7.8,0.22+s*0.47,-5.2+s*0.55);}
+  B(2.8,0.15,1.0,M.stair,-7.8,4.44,-1.3);
+  B(0.12,4.4,4.8,M.iWall,-6.3,2.2,-2.8);
+
+  B(21.6,0.15,13.6,M.iFloor,0,4.27,0);
+  B(0.15,4.0,13.6,M.iWall,-10.92,6.3,0);
+  B(0.15,4.0,13.6,M.iWall,10.92,6.3,0);
+  B(21.6,4.0,0.15,M.iWall,0,6.3,-6.92);
+  B(21.6,0.15,13.6,M.iCeil,0,8.32,0);
+
+  fillShelf(-9.3,4.27,-4,3.2);fillShelf(-9.3,4.27,0,3.2);fillShelf(-9.3,4.27,4,3.2);
+  fillShelf(9.3,4.27,-4,3.2);fillShelf(9.3,4.27,0,3.2);fillShelf(9.3,4.27,4,3.2);
+  fillShelf(-3.5,4.27,-5.4,3.0,Math.PI/2);fillShelf(3.5,4.27,-5.4,3.0,Math.PI/2);
+  fillShelf(0,4.27,-5.4,3.0,Math.PI/2);
+  readingTable(-3,4.27,2);readingTable(3,4.27,2);
+
+  const il1=new THREE.PointLight(0xffeecc,0.5,10);il1.position.set(0,7.5,-2);scene.add(il1);
+  const il2=new THREE.PointLight(0xffeecc,0.4,10);il2.position.set(0,3.5,-2);scene.add(il2);
+
+  B(22,0.06,8,M.pebble,0,0.03,-11.5);
+  streetLamp(-13,-12);streetLamp(13,-12);
+
+  if(!liteMode){
+    B(12,14,14,new THREE.MeshLambertMaterial({color:0xe0d4c0}),22,7,0);
+    B(10,10,14,new THREE.MeshLambertMaterial({color:0xd8cbb8}),-21,5,0);
+    B(14,0.5,14,new THREE.MeshLambertMaterial({color:0x9a6040}),22,14.25,0);
+    B(10,0.5,14,new THREE.MeshLambertMaterial({color:0x9a6040}),-21,10.25,0);
+    B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),3.5,0.02,-18.5);
+    B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),-3.5,0.02,-18.5);
+  }
+  B(1.5,0.02,3,new THREE.MeshLambertMaterial({color:0xffffff}),0,0.02,-18.5);
+});
 
 /* ── Camera state ── */
 let drag=false,rDrag=false,px=0,py=0;
@@ -746,6 +811,7 @@ window.addEventListener('message',e=>{
 
 function lerp(a,b,t){return a+(b-a)*t}
 
+let firstFrameRendered=false;
 function animate(){
   requestAnimationFrame(animate);
   if(animating&&aTgt){
@@ -763,6 +829,11 @@ function animate(){
     pl.intensity=0.75+Math.sin(Date.now()*0.003)*0.08;
   }
   renderer.render(scene,cam);
+  if(!firstFrameRendered){
+    firstFrameRendered=true;
+    hideLoading();
+    runDeferredSceneTasks();
+  }
 }
 animate();
 
@@ -771,8 +842,9 @@ window.addEventListener('resize',()=>{
   cam.updateProjectionMatrix();
   renderer.setSize(window.innerWidth,window.innerHeight);
 });
-
-hideLoading();
+}catch(err){
+  failStartup('Unable to build the 3D model on this device. Please refresh or try another browser.',err);
+}
 </script>
 </body>
 </html>

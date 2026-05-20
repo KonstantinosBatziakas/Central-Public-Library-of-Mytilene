@@ -93,10 +93,13 @@ canvas{display:block}
 const loadingEl=document.getElementById('loading');
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isMobile=window.matchMedia('(max-width: 980px), (pointer: coarse)').matches;
-const LOADING_TIMEOUT_MS=isMobile?45000:20000;
-let loadingWatchdog=setTimeout(()=>{
-  showLoadError('Building the 3D model is taking longer than expected. Please refresh and try again.');
-},LOADING_TIMEOUT_MS);
+const ua=navigator.userAgent||'';
+const isIPhone=/iPhone/i.test(ua);
+const isIOS=/(iPad|iPhone|iPod)/i.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const lowMemoryDevice=typeof navigator.deviceMemory==='number' && navigator.deviceMemory<=4;
+const liteMode=isIPhone || (isIOS && isMobile) || lowMemoryDevice;
+const LOADING_TIMEOUT_MS=liteMode?70000:(isMobile?50000:22000);
+let loadingWatchdog=null;
 
 function showLoadError(message){
   if(!loadingEl)return;
@@ -107,6 +110,24 @@ function showLoadError(message){
   if(bar)bar.style.display='none';
 }
 
+function updateLoadingStatus(message){
+  if(!loadingEl)return;
+  const text=loadingEl.querySelector('p');
+  if(text)text.textContent=message;
+}
+
+function startLoadingWatchdog(){
+  if(loadingWatchdog)clearTimeout(loadingWatchdog);
+  loadingWatchdog=setTimeout(()=>{
+    showLoadError('Building the 3D model is taking longer than expected on this device. Please wait or refresh.');
+  },LOADING_TIMEOUT_MS);
+}
+
+function failStartup(message,err){
+  showLoadError(message);
+  if(err)console.error('[3D] startup failure',err);
+}
+
 function hideLoading(){
   if(loadingWatchdog){
     clearTimeout(loadingWatchdog);
@@ -115,11 +136,22 @@ function hideLoading(){
   if(loadingEl)loadingEl.style.display='none';
 }
 
+window.addEventListener('error',e=>{
+  console.error('[3D] runtime error',e.error||e.message);
+});
+window.addEventListener('unhandledrejection',e=>{
+  console.error('[3D] unhandled rejection',e.reason);
+});
+
+startLoadingWatchdog();
+
 if(!window.THREE){
-  showLoadError('Unable to load the 3D engine. Check your connection and reload.');
+  failStartup('Unable to load the 3D engine. Check your connection and reload.');
   throw new Error('Three.js failed to load');
 }
 
+try{
+  updateLoadingStatus(liteMode?'Preparing iPhone optimized 3D scene…':'Building 3D Model…');
 const W=window.innerWidth, H=window.innerHeight;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x87CEEB);
@@ -130,24 +162,28 @@ cam.position.set(0,10,32);
 
 let renderer;
 try{
-  renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:isMobile?'low-power':'high-performance'});
+  renderer=new THREE.WebGLRenderer({
+    antialias:!liteMode,
+    powerPreference:(isMobile||liteMode)?'low-power':'high-performance',
+    alpha:false
+  });
 }catch(err){
-  showLoadError('Your device cannot start the 3D view. Please use another browser or device.');
+  failStartup('Your device cannot start the 3D view. Please use another browser or device.',err);
   throw err;
 }
 renderer.setSize(W,H);
-renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.5:2));
-const enableHighQualityShadows=!isMobile;
-renderer.shadowMap.enabled=enableHighQualityShadows;
+renderer.setPixelRatio(Math.min(devicePixelRatio,liteMode?1:(isMobile?1.35:2)));
+const enableHighQualityShadows=!isMobile && !liteMode;
+renderer.shadowMap.enabled=!liteMode;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.15;
+renderer.toneMappingExposure=liteMode?1.05:1.15;
 document.getElementById('wrap').appendChild(renderer.domElement);
 
 const amb=new THREE.AmbientLight(0xfff5e0,0.5);scene.add(amb);
 const sun=new THREE.DirectionalLight(0xfff0d0,2.0);
 sun.position.set(18,30,20);sun.castShadow=enableHighQualityShadows;
-sun.shadow.mapSize.set(enableHighQualityShadows?4096:2048,enableHighQualityShadows?4096:2048);
+sun.shadow.mapSize.set(enableHighQualityShadows?4096:1024,enableHighQualityShadows?4096:1024);
 sun.shadow.camera.left=-35;sun.shadow.camera.right=35;
 sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
 sun.shadow.camera.far=100;
