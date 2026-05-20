@@ -10,7 +10,7 @@ struct CollectionsView: View {
                 VStack(spacing: 12) {
                     ForEach(model.content.collections) { item in
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("\(item.icon)  \(item.title.value(for: model.language))")
+                            Text(item.title.value(for: model.language))
                                 .font(.headline)
                                 .foregroundStyle(.white)
                             Text(item.description.value(for: model.language))
