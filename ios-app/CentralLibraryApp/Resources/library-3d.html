@@ -91,7 +91,9 @@ canvas{display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const loadingEl=document.getElementById('loading');
-const LOADING_TIMEOUT_MS=20000;
+const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile=window.matchMedia('(max-width: 980px), (pointer: coarse)').matches;
+const LOADING_TIMEOUT_MS=isMobile?45000:20000;
 let loadingWatchdog=setTimeout(()=>{
   showLoadError('Building the 3D model is taking longer than expected. Please refresh and try again.');
 },LOADING_TIMEOUT_MS);
@@ -128,14 +130,15 @@ cam.position.set(0,10,32);
 
 let renderer;
 try{
-  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:isMobile?'low-power':'high-performance'});
 }catch(err){
   showLoadError('Your device cannot start the 3D view. Please use another browser or device.');
   throw err;
 }
 renderer.setSize(W,H);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.shadowMap.enabled=true;
+renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.5:2));
+const enableHighQualityShadows=!isMobile;
+renderer.shadowMap.enabled=enableHighQualityShadows;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.15;
@@ -143,8 +146,8 @@ document.getElementById('wrap').appendChild(renderer.domElement);
 
 const amb=new THREE.AmbientLight(0xfff5e0,0.5);scene.add(amb);
 const sun=new THREE.DirectionalLight(0xfff0d0,2.0);
-sun.position.set(18,30,20);sun.castShadow=true;
-sun.shadow.mapSize.set(4096,4096);
+sun.position.set(18,30,20);sun.castShadow=enableHighQualityShadows;
+sun.shadow.mapSize.set(enableHighQualityShadows?4096:2048,enableHighQualityShadows?4096:2048);
 sun.shadow.camera.left=-35;sun.shadow.camera.right=35;
 sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
 sun.shadow.camera.far=100;
@@ -626,7 +629,7 @@ function lerp(a,b,t){return a+(b-a)*t}
 function animate(){
   requestAnimationFrame(animate);
   if(animating&&aTgt){
-    const sp=0.045;
+    const sp=reduceMotion?0.16:0.045;
     sph.th=lerp(sph.th,aTgt.th,sp);
     sph.ph=lerp(sph.ph,aTgt.ph,sp);
     sph.r=lerp(sph.r,aTgt.r,sp);
@@ -636,7 +639,9 @@ function animate(){
     if(Math.abs(sph.th-aTgt.th)+Math.abs(sph.ph-aTgt.ph)+Math.abs(sph.r-aTgt.r)<0.002)animating=false;
     updateCam();
   }
-  pl.intensity=0.75+Math.sin(Date.now()*0.003)*0.08;
+  if(!reduceMotion){
+    pl.intensity=0.75+Math.sin(Date.now()*0.003)*0.08;
+  }
   renderer.render(scene,cam);
 }
 animate();
