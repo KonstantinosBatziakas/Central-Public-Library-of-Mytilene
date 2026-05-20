@@ -42,7 +42,7 @@
   "collections": [
     {
       "id": "6c5d3ca9-b4fc-49f3-bc1b-494622f6835f",
-      "icon": "📚",
+      "icon": "",
       "title": { "en": "General Collection", "gr": "Γενική Συλλογή" },
       "description": {
         "en": "Over 55,000 volumes spanning literature, science, history, philosophy and the arts. Open to all registered members free of charge.",
@@ -51,7 +51,7 @@
     },
     {
       "id": "9ae9b5bd-8f03-4f91-a08f-c92236c61350",
-      "icon": "🏺",
+      "icon": "",
       "title": { "en": "Rare Books", "gr": "Σπάνια Βιβλία" },
       "description": {
         "en": "A curated selection of rare and antiquarian volumes, including early printed books and illuminated manuscripts from the Aegean region.",
@@ -60,7 +60,7 @@
     },
     {
       "id": "7166b9f7-4d53-4712-8c26-7ad3d049f51f",
-      "icon": "✒️",
+      "icon": "",
       "title": { "en": "Vernardakis Archive", "gr": "Αρχείο Βερναρδάκη" },
       "description": {
         "en": "The personal archive of Demetrios Vernardakis (1833–1907), historian and playwright from Lesbos, comprising manuscripts, correspondence and personal documents.",
@@ -69,7 +69,7 @@
     },
     {
       "id": "ce0ef625-2dc7-4fc4-b425-16a3ec2e206b",
-      "icon": "🗺️",
+      "icon": "",
       "title": { "en": "Lefkias Historical Archive", "gr": "Αρχείο Λεφκία" },
       "description": {
         "en": "A major archive of historical documents, maps, photographs and press clippings relating to the history of Lesbos from the 19th century to the present.",
@@ -78,7 +78,7 @@
     },
     {
       "id": "f41b04f2-17d1-42fc-aac0-882ce19f9ad6",
-      "icon": "🎓",
+      "icon": "",
       "title": { "en": "Academic Journals", "gr": "Ακαδημαϊκά Περιοδικά" },
       "description": {
         "en": "An extensive collection of academic and scholarly journals across all disciplines, including digital access via the openABEKT national network.",
@@ -87,7 +87,7 @@
     },
     {
       "id": "dd0f66e2-c45d-4e98-9b86-c5607a6be2e5",
-      "icon": "💻",
+      "icon": "",
       "title": { "en": "Digital Catalogue", "gr": "Ψηφιακός Κατάλογος" },
       "description": {
         "en": "Full online catalogue access via Ψηφιακός Ηρόδοτος on the openABEKT platform. Search, reserve and explore the entire collection from any device.",

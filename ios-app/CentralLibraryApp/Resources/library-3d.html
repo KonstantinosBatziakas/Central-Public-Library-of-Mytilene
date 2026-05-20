@@ -31,12 +31,13 @@ canvas{display:block}
 .hint p{font-size:0.54rem;color:rgba(245,240,232,0.25);letter-spacing:0.07em;line-height:2}
 .hint span{color:rgba(184,149,42,0.55)}
 /* ZOOM CONTROLS */
-.zoom-controls{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:all}
+.zoom-controls{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:none}
 .zb{background:rgba(13,11,9,0.92);border:1px solid rgba(184,149,42,0.3);color:var(--gold);width:42px;height:42px;font-size:1.4rem;line-height:1;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-weight:300;font-family:'Cormorant Garamond',serif;user-select:none}
+.zb{pointer-events:auto;touch-action:none}
 .zb:hover{background:rgba(184,149,42,0.15);border-color:var(--gold)}
 .zb:active{background:rgba(184,149,42,0.3);transform:scale(0.93)}
 .zoom-label{font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(184,149,42,0.45);text-align:center;margin-top:4px;font-family:'Montserrat',sans-serif}
-.zoom-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
+.zoom-wrap{display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none}
 .loading{position:absolute;inset:0;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:100}
 .loading p{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold)}
 .bar{width:200px;height:1px;background:rgba(184,149,42,0.15);position:relative;overflow:hidden}
@@ -478,15 +479,32 @@ function stopZoom(){
 const zIn=document.getElementById('zoomIn');
 const zOut=document.getElementById('zoomOut');
 
-// Mouse
-zIn.addEventListener('mousedown',()=>startZoom(-1));
-zOut.addEventListener('mousedown',()=>startZoom(1));
-document.addEventListener('mouseup',stopZoom);
+function bindZoomButton(el,direction){
+  if(!el)return;
 
-// Touch
-zIn.addEventListener('touchstart',e=>{e.preventDefault();startZoom(-1);},{passive:false});
-zOut.addEventListener('touchstart',e=>{e.preventDefault();startZoom(1);},{passive:false});
-document.addEventListener('touchend',stopZoom);
+  const onPress=e=>{
+    if(e.cancelable)e.preventDefault();
+    e.stopPropagation();
+    startZoom(direction);
+  };
+
+  const onRelease=e=>{
+    if(e && e.cancelable)e.preventDefault();
+    if(e)e.stopPropagation();
+    stopZoom();
+  };
+
+  el.addEventListener('pointerdown',onPress,{passive:false});
+  el.addEventListener('pointerup',onRelease);
+  el.addEventListener('pointercancel',onRelease);
+  el.addEventListener('pointerleave',onRelease);
+  el.addEventListener('contextmenu',e=>e.preventDefault());
+}
+
+bindZoomButton(zIn,-1);
+bindZoomButton(zOut,1);
+document.addEventListener('pointerup',stopZoom);
+document.addEventListener('pointercancel',stopZoom);
 
 /* ── Views ── */
 const VIEWS={
