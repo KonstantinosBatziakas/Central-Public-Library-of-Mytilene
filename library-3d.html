@@ -130,9 +130,10 @@ canvas{display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const loadingEl=document.getElementById('loading');
+const LOADING_TIMEOUT_MS=20000;
 let loadingWatchdog=setTimeout(()=>{
   showLoadError('Building the 3D model is taking longer than expected. Please refresh and try again.');
-},20000);
+},LOADING_TIMEOUT_MS);
 
 function showLoadError(message){
   if(!loadingEl)return;
@@ -144,7 +145,10 @@ function showLoadError(message){
 }
 
 function hideLoading(){
-  if(loadingWatchdog){clearTimeout(loadingWatchdog);loadingWatchdog=null;}
+  if(loadingWatchdog){
+    clearTimeout(loadingWatchdog);
+    loadingWatchdog=null;
+  }
   if(loadingEl)loadingEl.style.display='none';
 }
 
