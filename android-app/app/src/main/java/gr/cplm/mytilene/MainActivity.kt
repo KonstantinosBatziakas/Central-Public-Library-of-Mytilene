@@ -9,9 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,15 +37,6 @@ class MainActivity : AppCompatActivity() {
             useWideViewPort = true
             loadWithOverviewMode = true
         }
-
-        ViewCompat.setOnApplyWindowInsetsListener(webView) { view, windowInsets ->
-            val insets = windowInsets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
-            )
-            view.setPadding(insets.left, insets.top, insets.right, insets.bottom)
-            windowInsets
-        }
-        ViewCompat.requestApplyInsets(webView)
 
         webView.webViewClient = WebViewClient()
         webView.webChromeClient = WebChromeClient()
