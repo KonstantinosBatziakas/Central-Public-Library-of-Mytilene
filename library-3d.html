@@ -38,6 +38,8 @@ canvas{display:block}
 .zb:active{background:rgba(184,149,42,0.3);transform:scale(0.93)}
 .zoom-label{font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(184,149,42,0.45);text-align:center;margin-top:4px;font-family:'Montserrat',sans-serif}
 .zoom-wrap{display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none}
+.mobile-overlay-toggle{display:none}
+.mobile-overlay-panel{display:contents}
 .loading{position:absolute;inset:0;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:100}
 .loading p{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold)}
 .bar{width:200px;height:1px;background:rgba(184,149,42,0.15);position:relative;overflow:hidden}
@@ -47,11 +49,20 @@ canvas{display:block}
   .title-box{top:calc(12px + var(--safe-top));left:calc(12px + var(--safe-left));max-width:90vw}
   .ttl{font-size:1.2rem}
   .sub{font-size:0.52rem}
-  .views{top:auto;right:calc(12px + var(--safe-right));left:calc(12px + var(--safe-left));bottom:calc(84px + var(--safe-bottom));flex-direction:row;overflow-x:auto;padding-bottom:2px}
-  .vb{flex:0 0 auto;font-size:0.52rem;padding:10px 12px}
-  .info{max-width:none;right:calc(12px + var(--safe-right));left:calc(12px + var(--safe-left));bottom:calc(152px + var(--safe-bottom));padding:12px 14px}
-  .hint{display:none}
-  .zoom-controls{bottom:calc(12px + var(--safe-bottom))}
+  .mobile-overlay{position:absolute;top:calc(12px + var(--safe-top));right:calc(12px + var(--safe-right));display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none;z-index:50}
+  .mobile-overlay-toggle{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(13,11,9,0.94);border:1px solid rgba(184,149,42,0.42);color:var(--gold);backdrop-filter:blur(10px);padding:0 14px;min-width:52px;height:52px;border-radius:999px;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-family:'Montserrat',sans-serif;font-weight:500;cursor:pointer;pointer-events:auto}
+  .mobile-overlay-toggle .toggle-icon{font-size:1rem;line-height:1}
+  .mobile-overlay-panel{display:flex;flex-direction:column;gap:10px;width:min(88vw,340px);max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 92px);overflow:auto;background:rgba(13,11,9,0.94);border:1px solid rgba(184,149,42,0.28);padding:10px;border-radius:14px;backdrop-filter:blur(10px);transition:transform 0.22s ease,opacity 0.22s ease;pointer-events:auto}
+  .mobile-overlay.is-collapsed .mobile-overlay-panel{transform:translateX(calc(100% + 20px));opacity:0;pointer-events:none}
+  .mobile-overlay-panel .views,
+  .mobile-overlay-panel .info,
+  .mobile-overlay-panel .zoom-controls,
+  .mobile-overlay-panel .hint{position:static;left:auto;right:auto;top:auto;bottom:auto;transform:none;max-width:none}
+  .mobile-overlay-panel .views{flex-direction:row;flex-wrap:wrap;overflow:visible;gap:8px;pointer-events:all}
+  .mobile-overlay-panel .vb{flex:1 1 auto;min-width:124px;font-size:0.52rem;padding:10px 12px}
+  .mobile-overlay-panel .info{padding:12px 14px}
+  .mobile-overlay-panel .zoom-controls{justify-content:flex-start}
+  .mobile-overlay-panel .hint{display:block;text-align:left}
 }
 @media(max-width:640px){
   .lbl{font-size:0.46rem}
@@ -76,33 +87,41 @@ canvas{display:block}
       <div class="ttl" id="ui-ttl">Public Central <em>Library</em></div>
       <div class="sub">Δημόσια Κεντρική Βιβλιοθήκη Μυτιλήνης</div>
     </div>
-    <div class="views">
-      <button class="vb on" id="vb-street" onclick="goView('street',event)" aria-label="Street View"><span class="vb-txt">Street View</span></button>
-      <button class="vb" id="vb-front" onclick="goView('front',event)" aria-label="Front Facade"><span class="vb-txt">Front Facade</span></button>
-      <button class="vb" id="vb-inside1" onclick="goView('inside1',event)" aria-label="Ground Floor"><span class="vb-txt">Ground Floor</span></button>
-      <button class="vb" id="vb-inside2" onclick="goView('inside2',event)" aria-label="First Floor"><span class="vb-txt">First Floor</span></button>
-      <button class="vb" id="vb-aerial" onclick="goView('aerial',event)" aria-label="Aerial View"><span class="vb-txt">Aerial View</span></button>
-      <button class="vb" id="vb-garden" onclick="goView('garden',event)" aria-label="Garden Side"><span class="vb-txt">Garden Side</span></button>
-    </div>
-    <div class="info" role="status" aria-live="polite">
-      <div class="ititle" id="ititle">Street View</div>
-      <div class="idesc" id="idesc">The Public Central Library of Mytilene on Smyrnis Street. A two-storey neoclassical building with white plastered walls, terracotta hip roof, and distinctive burgundy red windows with arched frames. Founded 1913.</div>
-    </div>
-    <!-- ZOOM BUTTONS -->
-    <div class="zoom-controls">
-      <div class="zoom-wrap">
-        <button class="zb" id="zoomIn" title="Zoom In">+</button>
-        <div class="zoom-label" id="zoom-in-lbl">Zoom In</div>
+    <div class="mobile-overlay" id="mobile-overlay">
+      <button class="mobile-overlay-toggle" id="mobile-overlay-toggle" type="button" aria-controls="mobile-overlay-panel" aria-expanded="true" aria-label="Hide controls">
+        <span class="toggle-icon" aria-hidden="true">☰</span>
+        <span id="mobile-overlay-toggle-text">Hide</span>
+      </button>
+      <div class="mobile-overlay-panel" id="mobile-overlay-panel" role="region" aria-label="3D controls">
+        <div class="views">
+          <button class="vb on" id="vb-street" onclick="goView('street',event)" aria-label="Street View"><span class="vb-txt">Street View</span></button>
+          <button class="vb" id="vb-front" onclick="goView('front',event)" aria-label="Front Facade"><span class="vb-txt">Front Facade</span></button>
+          <button class="vb" id="vb-inside1" onclick="goView('inside1',event)" aria-label="Ground Floor"><span class="vb-txt">Ground Floor</span></button>
+          <button class="vb" id="vb-inside2" onclick="goView('inside2',event)" aria-label="First Floor"><span class="vb-txt">First Floor</span></button>
+          <button class="vb" id="vb-aerial" onclick="goView('aerial',event)" aria-label="Aerial View"><span class="vb-txt">Aerial View</span></button>
+          <button class="vb" id="vb-garden" onclick="goView('garden',event)" aria-label="Garden Side"><span class="vb-txt">Garden Side</span></button>
+        </div>
+        <div class="info" role="status" aria-live="polite">
+          <div class="ititle" id="ititle">Street View</div>
+          <div class="idesc" id="idesc">The Public Central Library of Mytilene on Smyrnis Street. A two-storey neoclassical building with white plastered walls, terracotta hip roof, and distinctive burgundy red windows with arched frames. Founded 1913.</div>
+        </div>
+        <!-- ZOOM BUTTONS -->
+        <div class="zoom-controls">
+          <div class="zoom-wrap">
+            <button class="zb" id="zoomIn" title="Zoom In">+</button>
+            <div class="zoom-label" id="zoom-in-lbl">Zoom In</div>
+          </div>
+          <div class="zoom-wrap">
+            <button class="zb" id="zoomOut" title="Zoom Out">−</button>
+            <div class="zoom-label" id="zoom-out-lbl">Zoom Out</div>
+          </div>
+        </div>
+        <div class="hint">
+          <p><span>Drag</span> — <span id="hint-rotate">rotate</span></p>
+          <p><span>Scroll</span> — <span id="hint-zoom">zoom</span></p>
+          <p><span>Right drag</span> — <span id="hint-pan">pan</span></p>
+        </div>
       </div>
-      <div class="zoom-wrap">
-        <button class="zb" id="zoomOut" title="Zoom Out">−</button>
-        <div class="zoom-label" id="zoom-out-lbl">Zoom Out</div>
-      </div>
-    </div>
-    <div class="hint">
-      <p><span>Drag</span> — <span id="hint-rotate">rotate</span></p>
-      <p><span>Scroll</span> — <span id="hint-zoom">zoom</span></p>
-      <p><span>Right drag</span> — <span id="hint-pan">pan</span></p>
     </div>
   </div>
 </div>
@@ -535,6 +554,38 @@ function stopZoom(){
 
 const zIn=document.getElementById('zoomIn');
 const zOut=document.getElementById('zoomOut');
+const mobileOverlay=document.getElementById('mobile-overlay');
+const overlayToggle=document.getElementById('mobile-overlay-toggle');
+const overlayToggleText=document.getElementById('mobile-overlay-toggle-text');
+let overlayAutoHideTimer=null;
+const OVERLAY_AUTOHIDE_MS=4500;
+
+function isOverlayCollapsed(){
+  return mobileOverlay && mobileOverlay.classList.contains('is-collapsed');
+}
+
+function updateOverlayToggleText(){
+  if(!overlayToggle || !overlayToggleText)return;
+  const collapsed=isOverlayCollapsed();
+  const showText=isGreek?'Εμφάνιση':'Show';
+  const hideText=isGreek?'Απόκρυψη':'Hide';
+  overlayToggleText.textContent=collapsed?showText:hideText;
+  overlayToggle.setAttribute('aria-expanded',String(!collapsed));
+  overlayToggle.setAttribute('aria-label',collapsed?(isGreek?'Εμφάνιση ελέγχων':'Show controls'):(isGreek?'Απόκρυψη ελέγχων':'Hide controls'));
+}
+
+function setOverlayCollapsed(collapsed){
+  if(!mobileOverlay || !isMobile)return;
+  mobileOverlay.classList.toggle('is-collapsed',collapsed);
+  if(overlayAutoHideTimer){clearTimeout(overlayAutoHideTimer);overlayAutoHideTimer=null;}
+  updateOverlayToggleText();
+}
+
+function scheduleOverlayAutoHide(){
+  if(!isMobile || !mobileOverlay || isOverlayCollapsed())return;
+  if(overlayAutoHideTimer)clearTimeout(overlayAutoHideTimer);
+  overlayAutoHideTimer=setTimeout(()=>setOverlayCollapsed(true),OVERLAY_AUTOHIDE_MS);
+}
 
 function bindZoomButton(el,direction){
   if(!el)return;
@@ -562,6 +613,18 @@ bindZoomButton(zIn,-1);
 bindZoomButton(zOut,1);
 document.addEventListener('pointerup',stopZoom);
 document.addEventListener('pointercancel',stopZoom);
+
+if(isMobile && overlayToggle && mobileOverlay){
+  setOverlayCollapsed(true);
+  overlayToggle.addEventListener('click',e=>{
+    e.stopPropagation();
+    setOverlayCollapsed(!isOverlayCollapsed());
+    scheduleOverlayAutoHide();
+  });
+  mobileOverlay.addEventListener('pointerdown',()=>scheduleOverlayAutoHide());
+  mobileOverlay.addEventListener('touchstart',()=>scheduleOverlayAutoHide(),{passive:true});
+  renderer.domElement.addEventListener('pointerdown',()=>{if(!isOverlayCollapsed())setOverlayCollapsed(true);});
+}
 
 /* ── Views ── */
 const VIEWS={
@@ -633,6 +696,7 @@ function applyLanguage(greek){
   // zoom button labels
   document.getElementById('zoom-in-lbl').textContent=greek?'Μεγέθυνση':'Zoom In';
   document.getElementById('zoom-out-lbl').textContent=greek?'Σμίκρυνση':'Zoom Out';
+  updateOverlayToggleText();
 }
 
 window.addEventListener('message',e=>{
