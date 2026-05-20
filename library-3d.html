@@ -186,7 +186,7 @@ document.getElementById('wrap').appendChild(renderer.domElement);
 const amb=new THREE.AmbientLight(0xfff5e0,0.5);scene.add(amb);
 const sun=new THREE.DirectionalLight(0xfff0d0,2.0);
 sun.position.set(18,30,20);sun.castShadow=enableHighQualityShadows;
-sun.shadow.mapSize.set(enableHighQualityShadows?4096:1024,enableHighQualityShadows?4096:1024);
+sun.shadow.mapSize.set(enableHighQualityShadows?4096:2048,enableHighQualityShadows?4096:2048);
 sun.shadow.camera.left=-35;sun.shadow.camera.right=35;
 sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;
 sun.shadow.camera.far=100;
