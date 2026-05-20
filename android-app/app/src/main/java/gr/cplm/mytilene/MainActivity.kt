@@ -1,6 +1,7 @@
 package gr.cplm.mytilene
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -8,6 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,7 +19,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+
         webView = WebView(this)
+        webView.setBackgroundColor(Color.TRANSPARENT)
         setContentView(webView)
 
         webView.settings.apply {
@@ -27,6 +34,8 @@ class MainActivity : AppCompatActivity() {
             mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
             builtInZoomControls = false
             displayZoomControls = false
+            useWideViewPort = true
+            loadWithOverviewMode = true
         }
 
         webView.webViewClient = WebViewClient()
